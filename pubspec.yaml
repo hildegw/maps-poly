@@ -18,6 +18,7 @@ dependencies:
   flutter_bloc: ^4.0.0
   bloc: ^4.0.0
   shared_preferences: ^0.5.7+3
+  path_provider: ^1.6.9
 
 
 dev_dependencies:

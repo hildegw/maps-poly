@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bloc/bloc.dart';
 
+//only used if Google Location API is called directly
 
 class Location {
   final Coordinates coordinates;

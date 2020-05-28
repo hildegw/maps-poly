@@ -43,7 +43,6 @@ class _LocationPageState extends State<LocationPage> {
                             ? Text('error: ${state.error}')
                             : Text(state.position.toString()),
                       ),
-                      state.status == Status.showSaved ? Text(state.saved.latLon) : Container(),
                       FlatButton(
                         onPressed: () => geolocationBloc.add(GeoEvent.move), 
                         child: Text('start tracking'),
@@ -54,6 +53,16 @@ class _LocationPageState extends State<LocationPage> {
                         child: Text('stop tracking'),
                         color: Colors.blueGrey,
                       ),
+                      FlatButton(
+                        onPressed: () => geolocationBloc.add(GeoEvent.saveRoute), 
+                        child: Text('save route'),
+                        color: Colors.blueGrey,
+                      ),
+                      FlatButton(
+                        onPressed: () => geolocationBloc.add(GeoEvent.showSaved), 
+                        child: Text('show save'),
+                        color: Colors.blueGrey,    
+                      ),                  
                     ],
                   ),
                 ), 
