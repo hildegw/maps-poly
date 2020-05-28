@@ -1,0 +1,33 @@
+name: maps
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.2
+  google_maps_flutter: ^0.5.28+1
+  permission_handler: ^5.0.0+hotfix.3
+  geolocator: ^5.3.1
+  http: ^0.12.1
+  flutter_bloc: ^4.0.0
+  bloc: ^4.0.0
+  shared_preferences: ^0.5.7+3
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/icons/paw.png
+    - assets/icons/car.jpg
