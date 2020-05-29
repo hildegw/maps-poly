@@ -32,6 +32,7 @@ class _ReviewPageState extends State<ReviewPage> {
                       Flexible(child: MapReview()),
                       
                       Center(child: Text(state.position.toString()),),
+                      Center(child: Text(state.savedPaths.toString()),),
 
                       FlatButton(
                         onPressed: () => geolocationBloc.add(GeoEvent.deleteRoute), 
