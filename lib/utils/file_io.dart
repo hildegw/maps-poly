@@ -16,14 +16,14 @@ class FileIo {
 
   Future<File> _localFile(String fileName) async {
     final path = await _localPath;
-    return File('$path/my$fileName.txt');
+    return File('$path/myMapps$fileName.txt');
   }
 
   Future<List<String>> listDir() async {
     List<String> dirList = [];
     final directory = await getApplicationDocumentsDirectory();
     directory.list().listen((FileSystemEntity ent) {
-      dirList.add(ent.path.split('my')[1].replaceAll('.txt', ''));
+      dirList.add(ent.path.split('myMapps')[1].replaceAll('.txt', ''));
     });
     return dirList;
   }

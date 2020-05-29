@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
             routes: {
               'home': (_) => HomePage(),
               'location': (_) => LocationPage(),
-              'review': (_) => ReviewPage(),
             },
       ),
     );

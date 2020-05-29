@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../utils/geolocationModel.dart';
+import 'package:maps/pages/review_page.dart';
 import '../utils/geolocationBloc.dart';
-import '../widgets/mapSample.dart';
-
+import './track_page.dart';
 
 class LocationPage extends StatefulWidget {
   
@@ -11,66 +10,51 @@ class LocationPage extends StatefulWidget {
   _LocationPageState createState() => _LocationPageState();
 }
 
-class _LocationPageState extends State<LocationPage> {
+class _LocationPageState extends State<LocationPage> with SingleTickerProviderStateMixin {
+
+  List<Widget> listScreens;
+  int tabIndex = 0;
+
+  List<BottomNavigationBarItem> _tabsMenu =  [
+    BottomNavigationBarItem(icon: Icon(Icons.directions_car), title: Text('Track')),
+    BottomNavigationBarItem(icon: Icon(Icons.directions_transit), title: Text('Review')),
+    BottomNavigationBarItem(icon: Icon(Icons.directions_bike), title: Text('Track')),
+  ];
+
 
   @override
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
     geolocationBloc.add(GeoEvent.start);
+    listScreens = [
+      TrackPage(),
+      ReviewPage(),
+      TrackPage(),
+    ];    
     super.initState();
   }
 
+  
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
 
-    return BlocBuilder<GeolocationBloc, GeoState> (
-        builder: (context, state) {
-        return SafeArea(
-            child: Scaffold(
-              body: Container(
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Flexible(child: MapSample()),
-                      Center(
-                        child: state.status == Status.loading 
-                          ? Text('loading...')
-                          : state.status == Status.error
-                            ? Text('error: ${state.error}')
-                            : Text(state.position.toString()),
-                      ),
-                      FlatButton(
-                        onPressed: () => geolocationBloc.add(GeoEvent.move), 
-                        child: Text('start tracking'),
-                        color: Colors.blueGrey,
-                      ),
-                      FlatButton(
-                        onPressed: () => geolocationBloc.add(GeoEvent.stop), 
-                        child: Text('stop tracking'),
-                        color: Colors.blueGrey,
-                      ),
-                      FlatButton(
-                        onPressed: () => geolocationBloc.add(GeoEvent.saveRoute), 
-                        child: Text('save route'),
-                        color: Colors.blueGrey,
-                      ),
-                      FlatButton(
-                        onPressed: () {
-                          geolocationBloc.add(GeoEvent.showSaved);
-                          Navigator.pushNamed(context, 'review');
-                        }, 
-                        child: Text('show save'),
-                        color: Colors.blueGrey,    
-                      ),                  
-                    ],
-                  ),
-                ), 
-              )
-          );
-        });
+    return SafeArea(
+        child: Scaffold(
+          body: listScreens[tabIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            items: _tabsMenu,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.grey[400],
+            backgroundColor: Theme.of(context).primaryColor,
+            currentIndex: tabIndex,
+            onTap: (int index) {
+              setState(() {
+                tabIndex = index;
+              });
+            },
+          )
+        )
+      );
   }
 }
