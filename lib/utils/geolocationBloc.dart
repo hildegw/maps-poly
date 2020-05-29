@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import './geolocationApi.dart';
 
 
-enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved }
-enum Status { loading, showing, moving, reset, error }
+enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved, deleteRoute }
+enum Status { loading, showing, moving, showSaved, reset, error }
 
 
 class GeoState {
@@ -18,14 +18,16 @@ class GeoState {
   final Position position;
   final Map<PolylineId, Polyline>  polylines;
   final List<LatLng> route;
+  final List<LatLng> oldRoute;
   final String error;
-  GeoState({ this.status = Status.loading, this.position, this.polylines, this.route, this.error });
+  GeoState({ this.status = Status.loading, this.position, this.polylines, this.route, this.oldRoute, this.error });
 
   GeoState copyWith({
     Status status,
     Position position,
     Map<PolylineId, Polyline> polylines,
     List<LatLng> route,
+    List<LatLng> oldRoute,
     String error,
   }) {
     return GeoState(
@@ -33,6 +35,7 @@ class GeoState {
       position: position ?? this.position,
       polylines: polylines ?? this.polylines,
       route: route ?? this.route,
+      oldRoute: oldRoute ?? this.oldRoute,
       error: error ?? this.error,
     );
   }
@@ -47,6 +50,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
   StreamSubscription<Position> _positionStream;
   Map<PolylineId, Polyline> _polylines = Map();
   List<LatLng> _myRoute = List();
+  List<LatLng> _oldRoute = List();
   FileIo _fileIo = FileIo();
 
 
@@ -107,9 +111,10 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   _showSavedRoute() async {
     try {
-      List<LatLng> oldRoute =  await _fileIo.readRoute();
-      oldRoute != null ?  print('old route ${oldRoute.toString()} ') : print('no route data');
-    } catch(err) {  print('catching error showing saved route $err');  }
+      _oldRoute =  await _fileIo.readRoute();
+      print('old route? ${_oldRoute.toString()} ');
+      if (_oldRoute == null) throw('no route saved');
+          } catch(err) {  print('catching error showing saved route $err');  }
   }
 
 
@@ -151,13 +156,18 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         _saveRoute();
         break;
 
+      case GeoEvent.showSaved:
+        await _showSavedRoute();
+        yield state.copyWith(status: Status.showSaved, oldRoute: _oldRoute);
+        break;
+
+      case GeoEvent.deleteRoute:
+      //TODO
+        break;
+
       case GeoEvent.error:
         print('error event: $_errorText ');
         yield state.copyWith(status: Status.error, error: _errorText);
-        break;
-
-      case GeoEvent.showSaved:
-        _showSavedRoute();
         break;
 
       default:

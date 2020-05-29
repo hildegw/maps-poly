@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:maps/pages/splash.dart';
 import 'package:maps/utils/geolocationBloc.dart';
 import './pages/home.dart';
 import './pages/location_page.dart';
-import './pages/splash.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './utils/geolocationBloc.dart';
+import './pages/review_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,6 +25,7 @@ class MyApp extends StatelessWidget {
             routes: {
               'home': (_) => HomePage(),
               'location': (_) => LocationPage(),
+              'review': (_) => ReviewPage(),
             },
       ),
     );

@@ -18,15 +18,16 @@ class FileIo {
     return File('$path/myRoute.txt');
   }
 
-  Future<File> writeRoute(List<LatLng> route) async {
+  writeRoute(List<LatLng> route) async {
     final file = await _localFile;
-    //return file.writeAsString('$route');
-    var sink = file.openWrite();
-    sink.write(route);
-    sink.close();
+    return file.writeAsString('$route');
+    //var sink = file.openWrite();
+    //sink.write(route);
+    //sink.close();
   }
 
   Future<List<LatLng>> readRoute() async {
+    List<LatLng> route;
     try {
       final file = await _localFile;
       //String contents = await file.readAsString();
@@ -39,9 +40,14 @@ class FileIo {
         //.transform(new LineSplitter()) // Convert stream to individual lines.
         .listen((String line) {        // Process results.
             print('$line: ${line.length} bytes');
+            
+
           },
-          onDone: () { print('File is now closed.'); },
-          onError: (e) { print(e.toString()); });
+          onDone: () { 
+            print('File is now closed.'); 
+          },
+          onError: (e) { print(e.toString()); 
+        });
 
 
     } catch (e) {

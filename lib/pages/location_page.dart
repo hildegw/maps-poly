@@ -59,7 +59,10 @@ class _LocationPageState extends State<LocationPage> {
                         color: Colors.blueGrey,
                       ),
                       FlatButton(
-                        onPressed: () => geolocationBloc.add(GeoEvent.showSaved), 
+                        onPressed: () {
+                          geolocationBloc.add(GeoEvent.showSaved);
+                          Navigator.pushNamed(context, 'review');
+                        }, 
                         child: Text('show save'),
                         color: Colors.blueGrey,    
                       ),                  
