@@ -135,6 +135,10 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
     } catch(err) {  print('catching error showing saved route: $err');  }
   }
 
+  _deleteRoute(fileName) async {
+    await _fileIo.deleteFile(fileName);
+  }
+
 
   @override
   GeoState get initialState => GeoState(status: Status.loading, polylines: _polylines);
@@ -182,7 +186,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.deleteRoute:
-      //TODO
+        await _deleteRoute('test');
         break;
 
       case GeoEvent.error:
