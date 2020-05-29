@@ -6,7 +6,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import './geolocationApi.dart';
 
 
 enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved, deleteRoute }
@@ -105,16 +104,24 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   _saveRoute() async { //save to app file storage
     try {
+      print('saving route in bloc ${_myRoute.toString()} ');
       await _fileIo.writeRoute(_myRoute);
     } catch(err) {  print('catching error saving route $err');  }
   }
 
-  _showSavedRoute() async {
+  Future<List<LatLng>> _showSavedRoute() async {
     try {
-      _oldRoute =  await _fileIo.readRoute();
-      print('old route? ${_oldRoute.toString()} ');
-      if (_oldRoute == null) throw('no route saved');
-          } catch(err) {  print('catching error showing saved route $err');  }
+      Map<String, dynamic> fileData =  await _fileIo.readRoute();
+      print('saved data in bloc? $fileData ');
+      if (fileData != null && fileData['route'] != null) {
+        fileData['route'].forEach((dynamic item) {
+          _oldRoute.add(LatLng.fromJson(item));
+          print(_oldRoute);
+         });
+        return _oldRoute;
+      }
+      else throw('no route saved');
+    } catch(err) {  print('catching error showing saved route: $err');  }
   }
 
 
@@ -158,6 +165,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
       case GeoEvent.showSaved:
         await _showSavedRoute();
+        print('waiting done');
         yield state.copyWith(status: Status.showSaved, oldRoute: _oldRoute);
         break;
 

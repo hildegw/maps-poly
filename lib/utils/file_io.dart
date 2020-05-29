@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 
 
 class FileIo {
@@ -19,41 +20,40 @@ class FileIo {
   }
 
   writeRoute(List<LatLng> route) async {
+    final String now = new DateFormat('yyyy-MM-dd hh:mm').toString();
     final file = await _localFile;
-    return file.writeAsString('$route');
-    //var sink = file.openWrite();
-    //sink.write(route);
-    //sink.close();
+    var sink = file.openWrite();
+        String json = jsonEncode({
+      'fileName': 'myRoute.txt',
+      'timeStamp': now,
+      'route': route,
+    });
+    print('saved route data $json');
+    sink.write(json);
+    sink.close();
   }
 
-  Future<List<LatLng>> readRoute() async {
-    List<LatLng> route;
-    try {
+  Future<Map<String, dynamic>> readRoute() async {
+    Map<String, dynamic> fileData = {};
+    String json = '';
+
       final file = await _localFile;
       //String contents = await file.readAsString();
       //return int.parse(contents);
 
       Stream<List<int>> inputStream = file.openRead();
 
-      inputStream
+      var lines = inputStream
         .transform(utf8.decoder)       // Decode bytes to UTF-8.
-        //.transform(new LineSplitter()) // Convert stream to individual lines.
-        .listen((String line) {        // Process results.
-            print('$line: ${line.length} bytes');
-            
-
-          },
-          onDone: () { 
-            print('File is now closed.'); 
-          },
-          onError: (e) { print(e.toString()); 
-        });
-
-
-    } catch (e) {
-      // If encountering an error, return 0.
-      return [];
-    }
+        .transform(new LineSplitter()); // Convert stream to individual lines.
+      try {      
+        await for (var line in lines) {
+          print('$line: ${line.length} bytes');
+          json += line;
+        }
+        fileData = jsonDecode(json);
+      } catch (e) {print('inputStream catch error reading file ${e.toString()}'); }
+     // print('returning fileData $fileData ');
+      return fileData;
   }
-
 }
