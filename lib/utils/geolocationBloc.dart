@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 
 enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved, deleteRoute }
-enum Status { loading, showing, moving, stopped, showSaved, reset, error }
+enum Status { loading, showing, moving, stopped, saved, showSaved, reset, error }
 
 
 class GeoState {
@@ -182,7 +182,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       case GeoEvent.saveRoute:
         print('save route event');
         String name =_routeName ?? 'currentRoute';
-        _saveRoute(name);
+        await _saveRoute(name);
+        yield state.copyWith(status: Status.saved);
         break;
 
       case GeoEvent.showSaved:

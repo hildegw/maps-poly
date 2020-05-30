@@ -14,6 +14,9 @@ class TrackPage extends StatefulWidget {
 
 class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMixin {
 
+
+//TODO save file dialog, save with date?
+
   final _formKey = GlobalKey<FormState>();
   String _fileName;
 
@@ -131,49 +134,57 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                   color: Theme.of(context).buttonColor,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[  //remove_circle_outline                                   
 
-                    SizedBox(width: 20),
+                    SizedBox(width: 10, height: 50,),
                     
                     SizedBox(
                       height: 35,
                       width: 160,
-                      child: TextFormField(
+                      child: Form(
                         key: _formKey,
-                        validator: (value) { 
-                          if (value.isEmpty) return 'saving to current route file';
-                          else return null; 
-                        },
-                        onFieldSubmitted: (value) => _fileName = value,
-                        cursorColor: Theme.of(context).accentColor,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.headline2,
-                        decoration: InputDecoration(
-                          labelText: 'file name',  
-                          labelStyle: Theme.of(context).textTheme.subtitle1,
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
+                        child: TextFormField(
+                          validator: (value) { 
+                            if (value.isEmpty) return null; // 'saving to current route file';
+                            else return null; 
+                          },
+                          onFieldSubmitted: (value) => _fileName = value,
+                          cursorColor: Theme.of(context).accentColor,
+                          maxLines: 1,
+                          style: Theme.of(context).textTheme.headline2,
+                          decoration: InputDecoration(
+                            labelText: 'file name',  
+                            labelStyle: Theme.of(context).textTheme.subtitle1,
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
+                            ),
                           ),
                         ),
                       ),
                     ),
+                    
+                    SizedBox(width: 5,),
 
-                    IconButton(     // save data
-                      onPressed: () {
-                        if (_formKey.currentState.validate()) geolocationBloc.setSelectedRouteName(_fileName);                          
-                        else geolocationBloc.setSelectedRouteName('currentRoute');  //TODO set with date?
-                      geolocationBloc.add(GeoEvent.saveRoute);
-                      }, 
-                      icon: Icon(Icons.save_alt, size: 30,),
-                      color: Theme.of(context).accentColor,
-                      padding: EdgeInsets.only(bottom: 2, left: 0),
+                    Material(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.transparent,
+                      child: InkWell(     // save data
+                        onTap: () {
+                          if (_formKey.currentState.validate()) geolocationBloc.setSelectedRouteName(_fileName);                          
+                          else geolocationBloc.setSelectedRouteName('currentRoute');  
+                          geolocationBloc.add(GeoEvent.saveRoute);
+                        }, 
+                        child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
+                        splashColor: Theme.of(context).cardColor,
+                      ),
                     ),
 
+                    SizedBox(width: 10),
                   ],
                 ),
               ),
