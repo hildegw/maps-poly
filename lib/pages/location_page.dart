@@ -16,8 +16,8 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
   int tabIndex = 0;
 
   List<BottomNavigationBarItem> _tabsMenu =  [
-    BottomNavigationBarItem(icon: Icon(Icons.directions_car), title: Text('Track')),
-    BottomNavigationBarItem(icon: Icon(Icons.directions_transit), title: Text('Review')),
+    BottomNavigationBarItem(icon: Icon(Icons.directions_run), title: Text('Track')),
+    BottomNavigationBarItem(icon: Icon(Icons.map), title: Text('Review')),
     BottomNavigationBarItem(icon: Icon(Icons.directions_bike), title: Text('Track')),
   ];
 
@@ -44,8 +44,8 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
           body: listScreens[tabIndex],
           bottomNavigationBar: BottomNavigationBar(
             items: _tabsMenu,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey[400],
+            selectedItemColor: Theme.of(context).bottomAppBarColor,
+            unselectedItemColor: Theme.of(context).disabledColor,
             backgroundColor: Theme.of(context).primaryColor,
             currentIndex: tabIndex,
             onTap: (int index) {

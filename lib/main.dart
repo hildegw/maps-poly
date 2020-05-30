@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Maps Avancado',
             theme: ThemeData(
-              primarySwatch: Colors.blue,
+              primarySwatch: Colors.deepPurple,
             ),
             home: LocationPage(),//SplashPage(Permission.locationWhenInUse),
             routes: {
