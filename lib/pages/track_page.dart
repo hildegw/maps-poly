@@ -123,7 +123,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
               )
             ),
 
-            state.status == Status.stopped
+            state.status == Status.stopped //show file saving box
             ? Positioned(
               left: 75,
               bottom: 15,              
@@ -155,7 +155,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                           maxLines: 1,
                           style: Theme.of(context).textTheme.headline2,
                           decoration: InputDecoration(
-                            labelText: 'file name',  
+                            labelText: 'track name',  
                             labelStyle: Theme.of(context).textTheme.subtitle1,
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
@@ -189,6 +189,28 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                 ),
               ),
             ) : Container(),
+
+            state.status == Status.saved //show file saving box
+            ? Positioned(
+              left: 75,
+              bottom: 15,              
+              child: Container(
+                width: 226,
+                height: 50,
+                padding: EdgeInsets.only(top: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: Theme.of(context).buttonColor,
+                ),
+                child: Text(
+                        'Your track was saved.', 
+                        style: Theme.of(context).textTheme.headline2,
+                        textAlign: TextAlign.center,
+                      ),
+              ),
+            ) : Container(),
+
+
 
              
           ],

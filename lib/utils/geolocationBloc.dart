@@ -118,11 +118,16 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       }
     }
 
-  _saveRoute(String name) async { //save to app file storage
+  Future <bool> _saveRoute(String name) async { //save to app file storage
     try {
       print('saving route in bloc ${_myRoute.toString()} ');
       await _fileIo.writeRoute(_myRoute, name);
-    } catch(err) {  print('catching error saving route $err');  }
+      return true;
+    } catch(err) {  
+        print('catching error saving route $err');  
+        _errorText = err;
+        return false;
+      }
   }
 
   _showSavedRoute(String name) async {
@@ -182,8 +187,10 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       case GeoEvent.saveRoute:
         print('save route event');
         String name =_routeName ?? 'currentRoute';
-        await _saveRoute(name);
-        yield state.copyWith(status: Status.saved);
+        bool isSaved = await _saveRoute(name);
+        yield isSaved 
+          ? state.copyWith(status: Status.saved)
+          : state.copyWith(status: Status.error, error: _errorText);
         break;
 
       case GeoEvent.showSaved:
