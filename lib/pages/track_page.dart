@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import '../utils/geolocationBloc.dart';
 import '../widgets/map_track.dart';
-
+import 'dart:math' as math;
 
 class TrackPage extends StatefulWidget {
   
@@ -22,9 +22,10 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
 
   @override
   void initState() {
-    animC = AnimationController(duration: Duration(seconds: 5), vsync: this);
-    buttonAnim = Tween(begin: .7, end: 1)
-      .animate(CurvedAnimation(parent: animC, curve: Curves.easeInOutSine))
+    animC = AnimationController(duration: Duration(seconds: 1), vsync: this);
+    final CurvedAnimation curve = CurvedAnimation(parent: animC, curve: Curves.easeInOut);
+    buttonAnim = Tween(begin: .9, end: 1)
+      .animate(curve)  
       ..addListener(() {setState() {}});
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
     geolocationBloc.add(GeoEvent.start);
@@ -32,15 +33,29 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
   }
 
  _startStopTracker(bloc) {
-   if (bloc.state.status == Status.moving) bloc.add(GeoEvent.stop);
-   else bloc.add(GeoEvent.move);
+   if (bloc.state.status == Status.moving) {
+      animC.stop();
+      bloc.add(GeoEvent.stop);
+    } else {
+      buttonAnim.addStatusListener((status) {
+        if (status == AnimationStatus.completed) animC.reverse();
+        else if (status == AnimationStatus.dismissed) animC.forward();
+        setState(() {});
+      });
+      animC.forward();
+      bloc.add(GeoEvent.move);
+    }
  }
 
+  @override
+  void dispose() {
+    animC.dispose();
+    super.dispose();
+  }
 
  @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-    
     return BlocBuilder<GeolocationBloc, GeoState> (
         builder: (context, state) {
         return Container(
@@ -57,7 +72,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
               top:  10,
               child: Container(
                 width: 270,
-                padding: EdgeInsets.only(top: 12, bottom: 12),
+                padding: EdgeInsets.only(top: 8, bottom: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Theme.of(context).buttonColor,
@@ -84,30 +99,47 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
             
             Positioned(
               left: 30,
-              bottom:  45,              
+              bottom: 30,              
               child: Container(
-                padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                padding: EdgeInsets.all(4.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   color: Theme.of(context).buttonColor,
                 ),                
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[  //remove_circle_outline
-                                      
-                    IconButton(
+                child: IconButton(
                       onPressed: () => _startStopTracker(geolocationBloc), 
                       icon: state.status == Status.moving
-                        ? Icon(Icons.radio_button_checked, size: 35 * buttonAnim.value,)
-                        : Icon(Icons.radio_button_unchecked, size: 35,),
+                        ? Icon(Icons.radio_button_checked, size: 40.0 * buttonAnim.value,)
+                        : Transform.rotate(
+                            angle: -math.pi/2,
+                            child: Icon(Icons.play_circle_outline, size: 45,)
+                          ),
                       color: Theme.of(context).accentColor,
+                      padding: EdgeInsets.only(bottom: 0),
                     ),
+              )
+            ),
+
+            state.status == Status.stopped
+            ? Positioned(
+              left: 75,
+              bottom: 15,              
+              child: Container(
+                padding: EdgeInsets.only(left: 8, right: 3, top: 0, bottom: 0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: Theme.of(context).buttonColor,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[  //remove_circle_outline                                   
 
                     SizedBox(width: 20),
                     
                     SizedBox(
-                      height: 40,
-                      width: 200,
+                      height: 35,
+                      width: 160,
                       child: TextFormField(
                         key: _formKey,
                         validator: (value) { 
@@ -126,7 +158,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
-                          ),                      //contentPadding: EdgeInsets.all(0),
+                          ),
                         ),
                       ),
                     ),
@@ -137,16 +169,15 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                         else geolocationBloc.setSelectedRouteName('currentRoute');  //TODO set with date?
                       geolocationBloc.add(GeoEvent.saveRoute);
                       }, 
-                      icon: Icon(Icons.save_alt, size: 35,),
+                      icon: Icon(Icons.save_alt, size: 30,),
                       color: Theme.of(context).accentColor,
+                      padding: EdgeInsets.only(bottom: 2, left: 0),
                     ),
-
-                    SizedBox(width: 10),
 
                   ],
                 ),
               ),
-            ),
+            ) : Container(),
 
              
           ],
