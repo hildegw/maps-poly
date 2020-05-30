@@ -5,7 +5,6 @@ import './pages/location_page.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './utils/geolocationBloc.dart';
-import './pages/review_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,6 +19,12 @@ class MyApp extends StatelessWidget {
             title: 'Maps Avancado',
             theme: ThemeData(
               primarySwatch: Colors.deepPurple,
+              buttonColor: Color(0xccede7f6), //green button              
+              textTheme: TextTheme(
+                headline1: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
+                headline2: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                subtitle1: TextStyle(fontSize: 14.0, color: Colors.deepPurple),
+              ),
             ),
             home: LocationPage(),//SplashPage(Permission.locationWhenInUse),
             routes: {

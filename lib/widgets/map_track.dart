@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/geolocationBloc.dart';
 
 
 
-class MapSample extends StatelessWidget {
+class MapTrack extends StatelessWidget {
 
   final Completer<GoogleMapController> _controller = Completer();
 
@@ -33,14 +32,14 @@ class MapSample extends StatelessWidget {
         return geolocationBloc.state.status == Status.loading
           ? CircularProgressIndicator()        
           : GoogleMap(
-            mapType: MapType.hybrid,
-            myLocationButtonEnabled: true,
-            myLocationEnabled: true,
-            initialCameraPosition: CameraPosition(target: LatLng(state.position.latitude, state.position.longitude), zoom: 14),
-            polylines: Set.of(state.polylines.values),
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
+              mapType: MapType.hybrid,
+              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
+              initialCameraPosition: CameraPosition(target: LatLng(state.position.latitude, state.position.longitude), zoom: 14),
+              polylines: Set.of(state.polylines.values),
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
             //onTap: (pos) => print(pos.toString()),
           );
       });

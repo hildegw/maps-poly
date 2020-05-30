@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 
 enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved, deleteRoute }
-enum Status { loading, showing, moving, showSaved, reset, error }
+enum Status { loading, showing, moving, stopped, showSaved, reset, error }
 
 
 class GeoState {
@@ -58,7 +58,7 @@ class GeoState {
 
 class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
- String _errorText = '';
+  String _errorText = '';
   Position _position;
 
   StreamSubscription<Position> _positionStream;
@@ -106,8 +106,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         final myPolyline = Polyline(
             polylineId: PolylineId("me"),
             points: _myRoute,
-            color: Colors.cyanAccent,
-            width: 8
+            color: Colors.deepPurpleAccent[100],
+            width: 6
           );
         _polylines[myPolyline.polylineId] = myPolyline;
         this.add(GeoEvent.nextMove); //keep moving
@@ -158,7 +158,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.move:
-        await _startTracking();
+        print('move event');
+        _startTracking();
         yield state.copyWith(
           status: Status.moving, 
           position: _position, 
@@ -175,6 +176,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       case GeoEvent.stop:
         print('stop event');
         _stopTracking();
+        yield state.copyWith(status: Status.stopped);
         break;
 
       case GeoEvent.saveRoute:
