@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: ^0.5.7+3
   path_provider: ^1.6.9
   intl: ^0.16.1
+  convex_bottom_bar: ^2.2.1
 
 
 dev_dependencies:

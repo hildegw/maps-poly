@@ -6,6 +6,7 @@ import '../utils/geolocationBloc.dart';
 import '../widgets/map_track.dart';
 import 'dart:math' as math;
 
+
 class TrackPage extends StatefulWidget {
   
   @override
@@ -15,7 +16,7 @@ class TrackPage extends StatefulWidget {
 class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMixin {
 
 
-//TODO save file dialog, save with date?
+//TODO save with date?
 
   final _formKey = GlobalKey<FormState>();
   String _fileName;
@@ -70,7 +71,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
             
             MapTrack(),
             
-            Positioned(
+            Positioned( //Lat Lon info top 
               left: 10,
               top:  10,
               child: Container(
@@ -100,7 +101,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
               ),
             ),
             
-            Positioned(
+            Positioned(  //start stop button
               left: 30,
               bottom: 30,              
               child: Container(
@@ -147,7 +148,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                         key: _formKey,
                         child: TextFormField(
                           validator: (value) { 
-                            if (value.isEmpty) return null; // 'saving to current route file';
+                            if (value.isEmpty || value == null) return 'saving date'; // 'saving to current route file';
                             else return null; 
                           },
                           onFieldSubmitted: (value) => _fileName = value,
@@ -175,8 +176,9 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                       color: Colors.transparent,
                       child: InkWell(     // save data
                         onTap: () {
-                          if (_formKey.currentState.validate()) geolocationBloc.setSelectedRouteName(_fileName);                          
-                          else geolocationBloc.setSelectedRouteName('currentRoute');  
+                          String now = DateTime.now().toString();
+                          _fileName = _formKey.currentState.validate() ? _fileName : now;                          
+                          geolocationBloc.setSelectedRouteName(_fileName);  
                           geolocationBloc.add(GeoEvent.saveRoute);
                         }, 
                         child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
@@ -190,7 +192,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
               ),
             ) : Container(),
 
-            state.status == Status.saved //show file saving box
+            state.status == Status.saved //show file saving result
             ? Positioned(
               left: 75,
               bottom: 15,              

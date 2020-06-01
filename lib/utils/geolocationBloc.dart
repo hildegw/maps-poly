@@ -69,7 +69,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
   List<String> _savedPaths = [];
   FileIo _fileIo = FileIo();
 
-
+  //called from track page
   setSelectedRouteName(String name) => _routeName = name;
 
   _getPosition() async { //get initial location
@@ -120,8 +120,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   Future <bool> _saveRoute(String name) async { //save to app file storage
     try {
-      print('saving route in bloc ${_myRoute.toString()} ');
-      await _fileIo.writeRoute(_myRoute, name);
+      print('saving route with name $_routeName in bloc ${_myRoute.toString()} ');
+      await _fileIo.writeRoute(_myRoute, _routeName);
       return true;
     } catch(err) {  
         print('catching error saving route $err');  
@@ -185,7 +185,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.saveRoute:
-        print('save route event');
+        print('save route event, name $_routeName');
         String name =_routeName ?? 'currentRoute';
         bool isSaved = await _saveRoute(name);
         yield isSaved 
