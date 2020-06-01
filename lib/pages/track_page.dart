@@ -66,7 +66,6 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
         width: double.maxFinite,
         height: double.maxFinite,
         child: Stack(
-
           children: <Widget>[
             
             MapTrack(),
