@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../utils/geolocationBloc.dart';
 import '../widgets/map_track.dart';
 import 'dart:math' as math;
-
+import 'package:intl/intl.dart';
 
 class TrackPage extends StatefulWidget {
   
@@ -175,7 +175,8 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                       color: Colors.transparent,
                       child: InkWell(     // save data
                         onTap: () {
-                          String now = DateTime.now().toString();
+                          String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
+                          //DateTime.now().toString();
                           _fileName = _formKey.currentState.validate() ? _fileName : now;                          
                           geolocationBloc.setSelectedRouteName(_fileName);  
                           geolocationBloc.add(GeoEvent.saveRoute);

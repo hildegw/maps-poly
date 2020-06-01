@@ -30,7 +30,7 @@ class MapTrack extends StatelessWidget {
     return BlocBuilder<GeolocationBloc, GeoState> (
         builder: (context, state) {
         return geolocationBloc.state.status == Status.loading
-          ? CircularProgressIndicator()        
+          ? Center(child: CircularProgressIndicator())        
           : GoogleMap(
               mapType: MapType.hybrid,
               myLocationButtonEnabled: true,

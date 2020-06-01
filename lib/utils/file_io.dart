@@ -11,20 +11,28 @@ class FileIo {
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+    if (await Directory(directory.path + "/routes").exists() != true)
+        Directory(directory.path + "/routes").createSync(recursive: true);
+    return directory.path + "/routes/";
   }
 
   Future<File> _localFile(String fileName) async {
     final path = await _localPath;
-    return File('$path/myMapps$fileName.txt');
+    return File('$path$fileName.txt');
   }
 
   Future<List<String>> listDir() async {
     List<String> dirList = [];
+    final path = await _localPath;
     final directory = await getApplicationDocumentsDirectory();
-    directory.list().listen((FileSystemEntity ent) {
-      dirList.add(ent.path.split('myMapps')[1].replaceAll('.txt', ''));
+    directory.list(recursive: true).listen((FileSystemEntity ent) {
+      if (ent.path.contains('/routes/')) {
+        print('found a file ${ent.path}');
+        String removePath = ent.path.replaceAll(path, '');
+        dirList.add(removePath.replaceAll('.txt', ''));
+      }
     });
+    print(dirList.toString());
     return dirList;
   }
 
