@@ -24,39 +24,61 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
 
   List<LatLng> _oldRoute = List();
+  String _selectedRouteName;
 
   @override
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
     //geolocationBloc.setSelectedRouteName('TODO');
     geolocationBloc.add(GeoEvent.showSaved);
+    getGeoBlockData(geolocationBloc);
     super.initState();
   }
 
+  getGeoBlockData(GeolocationBloc geolocationBloc) async {
+    _oldRoute = await geolocationBloc.state.oldRoute;
+    List<String> allSavedPaths = await geolocationBloc.state.savedPaths;
+    _selectedRouteName = allSavedPaths != null && allSavedPaths.length > 0
+      ? allSavedPaths[0] : null;
+    print(geolocationBloc.state.oldRoute );
+    print(geolocationBloc.state.savedPaths.toString());
+  }
 
-  Widget FilesDropDown(context, state) {
-    String value = state.routeName;
-// Center(child: Text(state.savedPaths.toString()),), 
+  String posString() {
+    return _oldRoute != null && _oldRoute.length > 0
+      ? Position(
+        latitude: _oldRoute[_oldRoute.length-1].latitude.toPrecision(6), 
+        longitude: _oldRoute[_oldRoute.length-1].longitude.toPrecision(6)
+      ).toString() : '';
+  }
+
+//TODO fetch route data with selected route name
+//call showSavedRoute with name
+
+
+
+  Widget FilesDropDown(context, state, geolocationBloc) {
+    print('dropdown value in review page $_selectedRouteName ');
     return Container(
         height: 40,
-        width: 200,
+        width: 300,
         padding: EdgeInsets.all(4.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
           color: Theme.of(context).buttonColor,
         ),   
       child: DropdownButton<String>(
-        value: value,
+        value: _selectedRouteName,
         icon: Icon(Icons.arrow_downward),
         iconSize: 24,
         elevation: 16,
         style: Theme.of(context).textTheme.headline2,
-        //underline:
-        onChanged: (String newValue) {
-          setState(() { value = newValue;});
+        onChanged: (String newValue) { 
+          geolocationBloc.setSelectedRouteName(newValue);
+          geolocationBloc.add(GeoEvent.showSaved);
+          setState(() { _selectedRouteName = newValue;}); 
         },
-        items: state.savedPaths
-            .map<DropdownMenuItem<String>>((String value) {
+        items: state.savedPaths.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(value),
@@ -70,15 +92,6 @@ class _ReviewPageState extends State<ReviewPage> {
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-    _oldRoute = geolocationBloc.state.oldRoute ?? [];
-    
-    String posString = _oldRoute != null && _oldRoute.length > 0
-      ? Position(
-        latitude: _oldRoute[0].latitude.toPrecision(6), 
-        longitude: _oldRoute[0].longitude.toPrecision(6)
-      ).toString() : '';
-
-    print(posString);
 
     return BlocBuilder<GeolocationBloc, GeoState> (
         builder: (context, state) {
@@ -101,7 +114,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     color: Theme.of(context).buttonColor,
                   ),
                   child: Text(
-                    posString,
+                    posString(),
                     style: Theme.of(context).textTheme.headline2,
                     textAlign: TextAlign.center,
                   ),
@@ -111,7 +124,7 @@ class _ReviewPageState extends State<ReviewPage> {
               Positioned(  //drop down for files
                 left: 30,
                 bottom: 30,                  
-                child: FilesDropDown(context, state)
+                child: FilesDropDown(context, state, geolocationBloc),
               ),
 
               Positioned(  //edit button

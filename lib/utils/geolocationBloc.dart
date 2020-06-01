@@ -18,7 +18,7 @@ class GeoState {
   final Map<PolylineId, Polyline>  polylines;
   final List<LatLng> route;
   final List<LatLng> oldRoute;
-  final String routeName;
+  //final String routeName;
   final List<String> savedPaths;
   final String error;
   GeoState({ 
@@ -27,7 +27,7 @@ class GeoState {
     this.polylines, 
     this.route, 
     this.oldRoute, 
-    this.routeName,
+    //this.routeName,
     this.savedPaths,
     this.error 
     });
@@ -38,7 +38,7 @@ class GeoState {
     Map<PolylineId, Polyline> polylines,
     List<LatLng> route,
     List<LatLng> oldRoute,
-    String routeName,
+    //String routeName,
     List<String> savedPaths,
     String error,
   }) {
@@ -48,7 +48,7 @@ class GeoState {
       polylines: polylines ?? this.polylines,
       route: route ?? this.route,
       oldRoute: oldRoute ?? this.oldRoute,
-      routeName: routeName ?? this.routeName,
+      //routeName: routeName ?? this.routeName,
       savedPaths: savedPaths ?? this.savedPaths,
       error: error ?? this.error,
     );
@@ -132,15 +132,17 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   _showSavedRoute(String name) async {
     try {
-      _savedPaths = await _fileIo.listDir();
+      _savedPaths = await _fileIo.listDir() ?? [];
       Map<String, dynamic> fileData = await _fileIo.readRoute(name);
       print('saved data in bloc? $fileData ');
       if (fileData != null && fileData['route'] != null) {
         fileData['route'].forEach((dynamic item) {
           _oldRoute.add(LatLng.fromJson(item));
          });
+      } else {
+        _oldRoute = [];
+        throw('no route saved');
       }
-      else throw('no route saved');
     } catch(err) {  print('catching error showing saved route: $err');  }
   }
 

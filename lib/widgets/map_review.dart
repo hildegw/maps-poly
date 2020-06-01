@@ -18,9 +18,6 @@ class MapReview extends StatelessWidget {
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
 
-    print('review state ${geolocationBloc.state.status.toString()} ');
-
-
     if (geolocationBloc.state.oldRoute != null && geolocationBloc.state.oldRoute.length >0 ) {//(geolocationBloc.state.status == Status.showSaved) {
         _oldRoute = geolocationBloc.state.oldRoute;
         print('review ${_oldRoute.toString()} ');
