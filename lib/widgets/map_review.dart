@@ -14,39 +14,45 @@ class MapReview extends StatelessWidget {
   List<LatLng> _oldRoute = List();
 
 
+  // _move(Position position) async {
+  //   final cameraUpdate = CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude));
+  //   final GoogleMapController controller = await _controller.future;
+  //   controller.animateCamera(cameraUpdate);
+  // }
+ 
+
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
 
-    if (geolocationBloc.state.oldRoute != null && geolocationBloc.state.oldRoute.length >0 ) {//(geolocationBloc.state.status == Status.showSaved) {
-        _oldRoute = geolocationBloc.state.oldRoute;
-        print('review ${_oldRoute.toString()} ');
+      _oldRoute = geolocationBloc.state.oldRoute;
 
-        final myPolyline = Polyline(
-            polylineId: PolylineId("me"),
-            points: _oldRoute,
-            color: Colors.cyanAccent,
-            width: 8
-          );
-        _polylines[myPolyline.polylineId] = myPolyline;
+      final myPolyline = Polyline(
+          polylineId: PolylineId("me"),
+          points: _oldRoute,
+          color: Colors.deepPurpleAccent[100],
+          width: 6
+        );
+      _polylines[myPolyline.polylineId] = myPolyline;
 
-        return BlocBuilder<GeolocationBloc, GeoState> (
-            builder: (context, state) {
-            return GoogleMap(
+      return BlocBuilder<GeolocationBloc, GeoState> (
+          builder: (context, state) {
+          return geolocationBloc.state.status != Status.showSaved
+            ? Center(child: CircularProgressIndicator())  
+            : GoogleMap(
                 mapType: MapType.hybrid,
                 myLocationButtonEnabled: true,
                 myLocationEnabled: true,
-                initialCameraPosition: CameraPosition(target: _oldRoute[0], zoom: 14),
+                initialCameraPosition: _oldRoute != null && _oldRoute.length > 0
+                  ? CameraPosition(target: _oldRoute[_oldRoute.length-1], zoom: 14)
+                  : CameraPosition(target: LatLng(state.position.latitude, state.position.longitude), zoom: 14),
                 polylines: Set.of(_polylines.values),
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
-                //onTap: (pos) => print(pos.toString()),
               );
           });
-      
-      } else return Center(child: CircularProgressIndicator());
-  
+        
   }
 
 }

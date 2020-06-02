@@ -35,38 +35,33 @@ class _ReviewPageState extends State<ReviewPage> {
     super.initState();
   }
 
-  getGeoBlockData(GeolocationBloc geolocationBloc) async {
-    _oldRoute = await geolocationBloc.state.oldRoute;
-    List<String> allSavedPaths = await geolocationBloc.state.savedPaths;
+  getGeoBlockData(GeolocationBloc geolocationBloc) {
+    _oldRoute = geolocationBloc.state.oldRoute;
+    List<String> allSavedPaths = geolocationBloc.state.savedPaths;
     _selectedRouteName = allSavedPaths != null && allSavedPaths.length > 0
       ? allSavedPaths[0] : null;
-    print(geolocationBloc.state.oldRoute );
-    print(geolocationBloc.state.savedPaths.toString());
   }
 
-  String posString() {
+  String posString(state)  {
+    _oldRoute =  state.oldRoute;
     return _oldRoute != null && _oldRoute.length > 0
       ? Position(
         latitude: _oldRoute[_oldRoute.length-1].latitude.toPrecision(6), 
         longitude: _oldRoute[_oldRoute.length-1].longitude.toPrecision(6)
-      ).toString() : '';
+      ).toString() : state.position.toString();
   }
-
-//TODO fetch route data with selected route name
-//call showSavedRoute with name
-
 
 
   Widget FilesDropDown(context, state, geolocationBloc) {
     print('dropdown value in review page $_selectedRouteName ');
     return Container(
-        height: 40,
-        width: 300,
-        padding: EdgeInsets.all(4.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50),
-          color: Theme.of(context).buttonColor,
-        ),   
+      height: 40,
+      width: 300,
+      padding: EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: Theme.of(context).buttonColor,
+      ),   
       child: DropdownButton<String>(
         value: _selectedRouteName,
         icon: Icon(Icons.arrow_downward),
@@ -78,12 +73,13 @@ class _ReviewPageState extends State<ReviewPage> {
           geolocationBloc.add(GeoEvent.showSaved);
           setState(() { _selectedRouteName = newValue;}); 
         },
-        items: state.savedPaths.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList()
+        items: state.status == Status.showSaved 
+          ? state.savedPaths.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList() : [],
       ),
     );
   }
@@ -114,7 +110,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     color: Theme.of(context).buttonColor,
                   ),
                   child: Text(
-                    posString(),
+                    posString(state),
                     style: Theme.of(context).textTheme.headline2,
                     textAlign: TextAlign.center,
                   ),

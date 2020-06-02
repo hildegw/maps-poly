@@ -41,7 +41,7 @@ class FileIo {
     final file = await _localFile(fileName);
     var sink = file.openWrite();
         String json = jsonEncode({
-      'fileName': 'myRoute.txt',
+      'fileName': fileName,
       'timeStamp': now,
       'route': route,
     });

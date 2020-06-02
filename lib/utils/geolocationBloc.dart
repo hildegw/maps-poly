@@ -136,6 +136,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       Map<String, dynamic> fileData = await _fileIo.readRoute(name);
       print('saved data in bloc? $fileData ');
       if (fileData != null && fileData['route'] != null) {
+        _oldRoute = [];
         fileData['route'].forEach((dynamic item) {
           _oldRoute.add(LatLng.fromJson(item));
          });
@@ -188,7 +189,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
       case GeoEvent.saveRoute:
         print('save route event, name $_routeName');
-        String name =_routeName ?? 'currentRoute';
+        //if (_routeName == null) return;
+        String name =_routeName;
         bool isSaved = await _saveRoute(name);
         yield isSaved 
           ? state.copyWith(status: Status.saved)
@@ -196,7 +198,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.showSaved:
-        String name =_routeName ?? 'currentRoute';
+        //if (_routeName == null) return;
+        String name =_routeName;
         await _showSavedRoute(name);
         print('any files in bloc? $_savedPaths ');
         print('waiting done');
@@ -204,7 +207,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.deleteRoute:
-        String name =_routeName ?? 'currentRoute';
+        if (_routeName == null) return;
+        String name =_routeName;
         await _deleteRoute(name);
         break;
 
