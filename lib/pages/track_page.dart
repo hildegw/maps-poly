@@ -125,7 +125,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
 
             state.status == Status.stopped //show file saving box
             ? Positioned(
-              left: 75,
+              left: 90,
               bottom: 15,              
               child: Container(
                 padding: EdgeInsets.only(left: 8, right: 3, top: 0, bottom: 0),
@@ -138,8 +138,27 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[  //remove_circle_outline                                   
 
+                    SizedBox(width: 5, height: 50,),
+
+                    Material(  // save track icon
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.transparent,
+                      child: InkWell(     
+                        onTap: () {
+                          String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
+                          //print('on tap track page $_fileName or $now');
+                          //print('on tap track page ${_formKey.currentState.validate()}');
+                          _fileName = _formKey.currentState.validate() ? _fileName : now;                          
+                          geolocationBloc.setSelectedRouteName(_fileName);  
+                          geolocationBloc.add(GeoEvent.saveRoute);
+                        }, 
+                        child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
+                        splashColor: Theme.of(context).cardColor,
+                      ),
+                    ),
+
                     SizedBox(width: 10, height: 50,),
-                    
+
                     SizedBox(
                       height: 35,
                       width: 160,
@@ -156,7 +175,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                           maxLines: 1,
                           style: Theme.of(context).textTheme.headline2,
                           decoration: InputDecoration(
-                            labelText: 'track name',  
+                            labelText: 'add track name',  
                             labelStyle: Theme.of(context).textTheme.subtitle1,
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
@@ -171,22 +190,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                     
                     SizedBox(width: 5,),
 
-                    Material(
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.transparent,
-                      child: InkWell(     // save data
-                        onTap: () {
-                          String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
-                          //print('on tap track page $_fileName or $now');
-                          //print('on tap track page ${_formKey.currentState.validate()}');
-                          _fileName = _formKey.currentState.validate() ? _fileName : now;                          
-                          geolocationBloc.setSelectedRouteName(_fileName);  
-                          geolocationBloc.add(GeoEvent.saveRoute);
-                        }, 
-                        child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
-                        splashColor: Theme.of(context).cardColor,
-                      ),
-                    ),
+
 
                     SizedBox(width: 10),
                   ],
@@ -196,8 +200,8 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
 
             state.status == Status.saved //show file saving result
             ? Positioned(
-              left: 75,
-              bottom: 15,              
+              left: 90,
+              bottom: 15,                  
               child: Container(
                 width: 226,
                 height: 50,
