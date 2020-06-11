@@ -150,6 +150,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                             if (value.isEmpty || value == null) return 'saving date'; // 'saving to current route file';
                             else return null; 
                           },
+                          onChanged: (value) => _fileName = value,
                           onFieldSubmitted: (value) => _fileName = value,
                           cursorColor: Theme.of(context).accentColor,
                           maxLines: 1,
@@ -176,7 +177,8 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                       child: InkWell(     // save data
                         onTap: () {
                           String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
-                          //DateTime.now().toString();
+                          //print('on tap track page $_fileName or $now');
+                          //print('on tap track page ${_formKey.currentState.validate()}');
                           _fileName = _formKey.currentState.validate() ? _fileName : now;                          
                           geolocationBloc.setSelectedRouteName(_fileName);  
                           geolocationBloc.add(GeoEvent.saveRoute);

@@ -6,6 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './utils/geolocationBloc.dart';
 
+// ~/Android/Sdk/emulator/emulator -avd Pixel_XL_API_29
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
