@@ -57,70 +57,39 @@ class _ReviewPageState extends State<ReviewPage> {
     print('open track list? $_openTrackList ');
     
     return  //&& state.status == Status.showSaved 
-      Column(
-        children: <Widget>[          
-          if (_openTrackList) 
-            Container(      //show list of all tracks
-              width: 253,
-              height: state.savedPaths.length.toDouble() * 32,
-              padding: EdgeInsets.only(left: 24.0, right: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Theme.of(context).buttonColor,
-              ),   
-              child: ListView.builder(
-                itemCount: state.savedPaths.length,
-                itemBuilder: (BuildContext context, int index) {
-                  print('list with items in review drop down ${state.savedPaths[index]} ');
-                  return GestureDetector(
-                      onTap: () => setState(() { 
-                        _selectedRouteName = state.savedPaths[index]; 
-                        _openTrackList = !_openTrackList;
-                        geolocationBloc.setSelectedRouteName(_selectedRouteName);
-                        geolocationBloc.add(GeoEvent.showSaved);                  
-                        }),
-                      child: Padding(
-                        padding: index == 0 
-                          ? EdgeInsets.only(top: 12.0, bottom: 7)
-                          : EdgeInsets.symmetric(vertical: 7.0),
-                        child: Text(
-                              state.savedPaths[index] ?? 'no tracks available',
-                              style: Theme.of(context).textTheme.headline2,
-                              textAlign: TextAlign.center,
-                            ),
-                      ),
-                  );
-                }
-              )
-            ),
-      
-      if (_openTrackList) SizedBox(height: 8.0),
-
-      GestureDetector(  //selected track
-          onTap: () => setState(() { _openEdit = !_openEdit; }),
-          child: Container(      
-            height: 50,
-            width: 253,
-            padding: EdgeInsets.only(left: 24.0, right: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: Theme.of(context).buttonColor,
-            ),   
-            child:  Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                    _selectedRouteName ?? 'please select a track',
-                    style: Theme.of(context).textTheme.headline2,
-                    textAlign: TextAlign.center,
+        Container(      //show list of all tracks
+          width: 215,
+          height: math.min(350, state.savedPaths.length.toDouble() * 32),
+          padding: EdgeInsets.only(left: 24.0, right: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: Theme.of(context).buttonColor,
+          ),   
+          child: ListView.builder(
+            itemCount: state.savedPaths.length,
+            itemBuilder: (BuildContext context, int index) {
+              print('list with items in review drop down ${state.savedPaths[index]} ');
+              return GestureDetector(
+                  onTap: () => setState(() { 
+                    _selectedRouteName = state.savedPaths[index]; 
+                    _openTrackList = !_openTrackList;
+                    geolocationBloc.setSelectedRouteName(_selectedRouteName);
+                    geolocationBloc.add(GeoEvent.showSaved);                  
+                    }),
+                  child: Padding(
+                    padding: index == 0 
+                      ? EdgeInsets.only(top: 12.0, bottom: 7)
+                      : EdgeInsets.symmetric(vertical: 7.0),
+                    child: Text(
+                          state.savedPaths[index] ?? 'no tracks available',
+                          style: Theme.of(context).textTheme.headline2,
+                          textAlign: TextAlign.center,
+                        ),
                   ),
-                Icon(Icons.edit, size: 25.0, color: Theme.of(context).accentColor,),
-              ],
-            ),
-          ),
-        )
-      ],
-    );
+              );
+            }
+          )
+        );
   }
 
 
@@ -159,17 +128,47 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
 
 //DropDown
-              _openEdit ? Container() 
+              _openTrackList ? Container() 
               : Positioned(  //drop down for files
-                  left: 90,
-                  bottom: 15,                   
+                  left: 45,
+                  bottom: 75,                   
                     child: FilesDropDown(context, state, geolocationBloc),
                 ),
+
+//selected track box
+              Positioned(
+                left: 90,
+                bottom: 15,  
+                child: GestureDetector(  
+                  onTap: () => setState(() { _openEdit = !_openEdit; }),
+                  child: Container(      
+                    height: 50,
+                    width: 215,
+                    padding: EdgeInsets.only(left: 24.0, right: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Theme.of(context).buttonColor,
+                    ),   
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                            _selectedRouteName ?? 'please select a track',
+                            style: Theme.of(context).textTheme.headline2.copyWith(fontSize: 14),
+                            textAlign: TextAlign.center,
+                          ),
+                        Icon(Icons.edit, size: 25.0, color: Theme.of(context).accentColor,),
+                      ],
+                    ),
+                  ),
+                ),
+            ),
+
 
 //Open drop down button, icon and ring
               Positioned(  
                 left: 30,
-                bottom: 30,              
+                bottom: 40,              
                 child: Container(
                   padding: EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
@@ -181,9 +180,9 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
               Positioned(  
                 left: 33,
-                bottom: 33,              
+                bottom: 43,              
                     child: IconButton(
-                      onPressed: () => setState(() { if (!_openEdit) _openTrackList = !_openTrackList; }), //geolocationBloc.add(GeoEvent.deleteRoute), 
+                      onPressed: () => setState(() { _openTrackList = !_openTrackList; }), //geolocationBloc.add(GeoEvent.deleteRoute), 
                       icon: _openTrackList 
                         ? Icon(Icons.arrow_drop_down, size: 40.0)
                         : Icon(Icons.arrow_drop_up, size: 40.0),
@@ -192,6 +191,35 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
               ),
 
+//delete track
+              Positioned(  
+                left: 65,
+                bottom: 8,              
+                child: Container(
+                  padding: EdgeInsets.all(2.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Theme.of(context).buttonColor,
+                  ),                
+                  child: Icon(Icons.radio_button_unchecked, size: 30.0, color: Theme.of(context).accentColor,),
+                )
+              ),
+              Positioned(  
+                left: 58,
+                bottom: 2,              
+                    child: IconButton(
+                      onPressed: () {
+                        String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
+                        _fileName = _formKey.currentState.validate() ? _fileName : now;                          
+                        geolocationBloc.add(GeoEvent.deleteRoute);
+                      },
+                      icon: Icon(Icons.delete_outline, size: 18.0),
+                      color: Theme.of(context).accentColor,
+                      padding: EdgeInsets.only(bottom: 0),
+                    ),
+              ),
+              
+          
 //name edit & delete form field
               _openEdit  //show track edit & delete field
                 ? Positioned(
@@ -208,30 +236,11 @@ class _ReviewPageState extends State<ReviewPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[  //remove_circle_outline                                   
 
-                        SizedBox(width: 5, height: 50,),
-
-                        Material(  // save new track name TODO
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.transparent,
-                          child: InkWell(     
-                            onTap: () {
-                              //TODO
-                              setState(() { 
-                                _openEdit = !_openEdit; 
-                                _openTrackList = false;
-                              });
-                              //_fileName = _formKey.currentState.validate() ? _fileName : null;                          
-                            }, 
-                            child: Icon(Icons.check_circle_outline, size: 30, color: Theme.of(context).accentColor,),
-                            splashColor: Theme.of(context).cardColor,
-                          ),
-                        ),
-
-                        SizedBox(width: 3, height: 50,),
+                        SizedBox(width: 10, height: 50,), //defines background height
 
                         SizedBox(
                           height: 35,
-                          width: 160,
+                          width: 155,
                           child: Form(
                             key: _formKey,
                             child: TextFormField(
@@ -259,23 +268,53 @@ class _ReviewPageState extends State<ReviewPage> {
                           ),
                         ),
                         
-                        SizedBox(width: 7),
+                        SizedBox(width: 5),
 
-                        Material(  // delete track icon
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.transparent,
-                          child: InkWell(     
-                            onTap: () {
-                              String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
-                              _fileName = _formKey.currentState.validate() ? _fileName : now;                          
-                              geolocationBloc.add(GeoEvent.deleteRoute);
-                            }, 
-                            child: Icon(Icons.delete_outline, size: 30, color: Theme.of(context).accentColor,),
-                            splashColor: Theme.of(context).cardColor,
-                          ),
+                        Column(
+                          children: <Widget>[
+                            Material(  // save new track name 
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.transparent,
+                              child: InkWell(     
+                                onTap: () {
+                                  //TODO
+                                  setState(() { 
+                                    _openEdit = !_openEdit; 
+                                    //_openTrackList = false;
+                                  });
+                                  //_fileName = _formKey.currentState.validate() ? _fileName : null;                          
+                                }, 
+                                child: Icon(Icons.check_circle_outline, size: 20, color: Theme.of(context).accentColor,),
+                                splashColor: Theme.of(context).cardColor,
+                              ),
+                            ),
+
+                            Material(  // close edit track x with circle
+                              borderRadius: BorderRadius.circular(50),
+                              color: Colors.transparent,
+                              child: InkWell(     
+                                onTap: () { setState(() { 
+                                  _openEdit = false; 
+                                  //_openTrackList = false;
+                                });}, 
+                                child: Stack(
+                                  children: <Widget>[
+                                    Positioned(
+                                      top: 2,
+                                      left: 2,
+                                      child: Icon(Icons.close, size: 16, color: Theme.of(context).accentColor,)
+                                    ),
+                                    Icon(Icons.radio_button_unchecked, size: 20.0, color: Theme.of(context).accentColor,),
+                                  ],
+                                ),
+                                splashColor: Theme.of(context).cardColor,
+                              ),
+                            ),                            
+                          ],
                         ),
 
-                        SizedBox(width: 7),
+
+                        SizedBox(width: 14),
 
                       ],
                     ),
