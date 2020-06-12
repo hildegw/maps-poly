@@ -34,7 +34,6 @@ class _ReviewPageState extends State<ReviewPage> {
   @override
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-    //geolocationBloc.setSelectedRouteName('TODO');
     geolocationBloc.add(GeoEvent.showSaved);
     super.initState();
   }
@@ -51,11 +50,6 @@ class _ReviewPageState extends State<ReviewPage> {
 
 
   Widget FilesDropDown(context, state, geolocationBloc) {
-    //preset drop down with last value
-    if (_selectedRouteName == null && state.status == Status.showSaved && state.savedPaths.length > 0) 
-        _selectedRouteName = state.savedPaths[state.savedPaths.length-1];
-    print('open track list? $_openTrackList ');
-    
     return  //&& state.status == Status.showSaved 
         Container(      //show list of all tracks
           width: 215,
@@ -101,6 +95,11 @@ class _ReviewPageState extends State<ReviewPage> {
 
     return BlocBuilder<GeolocationBloc, GeoState> (
         builder: (context, state) {
+        //preset text edit with last value
+        if (_selectedRouteName == null && state.status == Status.showSaved && state.savedPaths.length > 0) 
+            _selectedRouteName = state.savedPaths[state.savedPaths.length-1];
+        print('open track list? $_openTrackList ');
+
         return Container(
           width: double.maxFinite,
           height: double.maxFinite,
@@ -128,12 +127,12 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
 
 //DropDown
-              _openTrackList ? Container() 
-              : Positioned(  //drop down for files
+              _openTrackList
+              ? Positioned(  //drop down for files
                   left: 45,
                   bottom: 75,                   
                     child: FilesDropDown(context, state, geolocationBloc),
-                ),
+                ) : Container(),
 
 //selected track box
               Positioned(
@@ -200,7 +199,7 @@ class _ReviewPageState extends State<ReviewPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
                     color: Theme.of(context).buttonColor,
-                  ),                
+                  ),
                   child: Icon(Icons.radio_button_unchecked, size: 30.0, color: Theme.of(context).accentColor,),
                 )
               ),
@@ -208,9 +207,7 @@ class _ReviewPageState extends State<ReviewPage> {
                 left: 58,
                 bottom: 2,              
                     child: IconButton(
-                      onPressed: () {
-                        String now = DateFormat.yMMMd().add_Hm().format(DateTime.now());
-                        _fileName = _formKey.currentState.validate() ? _fileName : now;                          
+                      onPressed: () {                         
                         geolocationBloc.add(GeoEvent.deleteRoute);
                       },
                       icon: Icon(Icons.delete_outline, size: 18.0),
@@ -220,7 +217,7 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
               
           
-//name edit & delete form field
+//edit form field
               _openEdit  //show track edit & delete field
                 ? Positioned(
                   left: 90,

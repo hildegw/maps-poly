@@ -119,6 +119,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
     }
 
   Future <bool> _saveRoute(String name) async { //save to app file storage
+  //TODO check if name exists and overwrite
     try {
       print('saving route with name $_routeName in bloc ${_myRoute.toString()} ');
       await _fileIo.writeRoute(_myRoute, _routeName);
@@ -149,6 +150,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   _deleteRoute(fileName) async {
     await _fileIo.deleteFile(fileName);
+    //TODO update list of saved tracks, make sure that last track loads after delete
   }
 
 
