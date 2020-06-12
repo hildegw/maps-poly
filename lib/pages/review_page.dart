@@ -56,41 +56,49 @@ class _ReviewPageState extends State<ReviewPage> {
         _selectedRouteName = state.savedPaths[state.savedPaths.length-1];
     print('open track list? $_openTrackList ');
     
-    return _openTrackList //&& state.status == Status.showSaved 
-      ? Container(      //closes list
-          width: 253,
-          height: state.savedPaths.length.toDouble() * 30,
-          padding: EdgeInsets.only(left: 24.0, right: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            color: Theme.of(context).buttonColor,
-          ),   
-          child: ListView.builder(
-            itemCount: state.savedPaths.length,
-            itemBuilder: (BuildContext context, int index) {
-              print('list with items in review drop down ${state.savedPaths[index]} ');
-              return GestureDetector(
-                  onTap: () => setState(() { 
-                    _selectedRouteName = state.savedPaths[index]; 
-                    _openTrackList = !_openTrackList;
-                    geolocationBloc.setSelectedRouteName(_selectedRouteName);
-                    geolocationBloc.add(GeoEvent.showSaved);                  
-                    }),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: Text(
-                          state.savedPaths[index] ?? 'no tracks available',
-                          style: Theme.of(context).textTheme.headline2,
-                          textAlign: TextAlign.center,
-                        ),
-                  ),
-              );
-            }
-          )
-        )
-      : GestureDetector(  //closed drop down clickable area
+    return  //&& state.status == Status.showSaved 
+      Column(
+        children: <Widget>[          
+          if (_openTrackList) 
+            Container(      //show list of all tracks
+              width: 253,
+              height: state.savedPaths.length.toDouble() * 32,
+              padding: EdgeInsets.only(left: 24.0, right: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Theme.of(context).buttonColor,
+              ),   
+              child: ListView.builder(
+                itemCount: state.savedPaths.length,
+                itemBuilder: (BuildContext context, int index) {
+                  print('list with items in review drop down ${state.savedPaths[index]} ');
+                  return GestureDetector(
+                      onTap: () => setState(() { 
+                        _selectedRouteName = state.savedPaths[index]; 
+                        _openTrackList = !_openTrackList;
+                        geolocationBloc.setSelectedRouteName(_selectedRouteName);
+                        geolocationBloc.add(GeoEvent.showSaved);                  
+                        }),
+                      child: Padding(
+                        padding: index == 0 
+                          ? EdgeInsets.only(top: 12.0, bottom: 7)
+                          : EdgeInsets.symmetric(vertical: 7.0),
+                        child: Text(
+                              state.savedPaths[index] ?? 'no tracks available',
+                              style: Theme.of(context).textTheme.headline2,
+                              textAlign: TextAlign.center,
+                            ),
+                      ),
+                  );
+                }
+              )
+            ),
+      
+      if (_openTrackList) SizedBox(height: 8.0),
+
+      GestureDetector(  //selected track
           onTap: () => setState(() { _openEdit = !_openEdit; }),
-          child: Container(      //closes list
+          child: Container(      
             height: 50,
             width: 253,
             padding: EdgeInsets.only(left: 24.0, right: 16),
@@ -98,15 +106,21 @@ class _ReviewPageState extends State<ReviewPage> {
               borderRadius: BorderRadius.circular(50),
               color: Theme.of(context).buttonColor,
             ),   
-            child:  Center(
-              child: Text(
-                  _selectedRouteName ?? 'please select a track',
-                  style: Theme.of(context).textTheme.headline2,
-                  textAlign: TextAlign.center,
-                ),
+            child:  Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                    _selectedRouteName ?? 'please select a track',
+                    style: Theme.of(context).textTheme.headline2,
+                    textAlign: TextAlign.center,
+                  ),
+                Icon(Icons.edit, size: 25.0, color: Theme.of(context).accentColor,),
+              ],
             ),
           ),
-        );
+        )
+      ],
+    );
   }
 
 
@@ -152,7 +166,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     child: FilesDropDown(context, state, geolocationBloc),
                 ),
 
-//Open drop down button
+//Open drop down button, icon and ring
               Positioned(  
                 left: 30,
                 bottom: 30,              
@@ -165,12 +179,14 @@ class _ReviewPageState extends State<ReviewPage> {
                   child: Icon(Icons.radio_button_unchecked, size: 46.0, color: Theme.of(context).accentColor,),
                 )
               ),
-              Positioned(  //edit button ring and background
-                left: 34,
+              Positioned(  
+                left: 33,
                 bottom: 33,              
                     child: IconButton(
-                      onPressed: () => setState(() { _openTrackList = !_openTrackList; }), //geolocationBloc.add(GeoEvent.deleteRoute), 
-                      icon:Icon(Icons.arrow_drop_down, size: 23.0),
+                      onPressed: () => setState(() { if (!_openEdit) _openTrackList = !_openTrackList; }), //geolocationBloc.add(GeoEvent.deleteRoute), 
+                      icon: _openTrackList 
+                        ? Icon(Icons.arrow_drop_down, size: 40.0)
+                        : Icon(Icons.arrow_drop_up, size: 40.0),
                       color: Theme.of(context).accentColor,
                       padding: EdgeInsets.only(bottom: 0),
                     ),
@@ -200,10 +216,13 @@ class _ReviewPageState extends State<ReviewPage> {
                           child: InkWell(     
                             onTap: () {
                               //TODO
-                              setState(() { _openEdit = !_openEdit; });
+                              setState(() { 
+                                _openEdit = !_openEdit; 
+                                _openTrackList = false;
+                              });
                               //_fileName = _formKey.currentState.validate() ? _fileName : null;                          
                             }, 
-                            child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
+                            child: Icon(Icons.check_circle_outline, size: 30, color: Theme.of(context).accentColor,),
                             splashColor: Theme.of(context).cardColor,
                           ),
                         ),
@@ -220,14 +239,15 @@ class _ReviewPageState extends State<ReviewPage> {
                                 if (value.isEmpty || value == null) return 'saving date'; // 'saving to current route file';
                                 else return null; 
                               },
+                              initialValue: _selectedRouteName,
                               onChanged: (value) => _fileName = value,
                               onFieldSubmitted: (value) => _fileName = value,
                               cursorColor: Theme.of(context).accentColor,
                               maxLines: 1,
                               style: Theme.of(context).textTheme.headline2,
                               decoration: InputDecoration(
-                                labelText: _selectedRouteName,  
-                                labelStyle: Theme.of(context).textTheme.subtitle1,
+                                //labelText: _selectedRouteName,  
+                                //labelStyle: Theme.of(context).textTheme.subtitle1,
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color:  Theme.of(context).accentColor, width: 2.0),
                                 ),
