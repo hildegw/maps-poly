@@ -50,8 +50,9 @@ class _ReviewPageState extends State<ReviewPage> {
 
 
   Widget FilesDropDown(context, state, geolocationBloc) {
-    return  //&& state.status == Status.showSaved 
-        Container(      //show list of all tracks
+    print(state.savedPaths.length);
+    return  state.savedPaths.length > 0
+      ? Container(      //show list of all tracks
           width: 215,
           height: math.min(350, state.savedPaths.length.toDouble() * 32),
           padding: EdgeInsets.only(left: 24.0, right: 16),
@@ -60,29 +61,44 @@ class _ReviewPageState extends State<ReviewPage> {
             color: Theme.of(context).buttonColor,
           ),   
           child: ListView.builder(
-            itemCount: state.savedPaths.length,
-            itemBuilder: (BuildContext context, int index) {
-              print('list with items in review drop down ${state.savedPaths[index]} ');
-              return GestureDetector(
-                  onTap: () => setState(() { 
-                    _selectedRouteName = state.savedPaths[index]; 
-                    _openTrackList = !_openTrackList;
-                    geolocationBloc.setSelectedRouteName(_selectedRouteName);
-                    geolocationBloc.add(GeoEvent.showSaved);                  
+              itemCount: state.savedPaths.length,
+              itemBuilder: (BuildContext context, int index) {
+                print('list with items in review drop down ${state.savedPaths[index]} ');
+                return GestureDetector(
+                    onTap: () => setState(() { 
+                      _selectedRouteName = state.savedPaths[index]; 
+                      _openTrackList = !_openTrackList;
+                      geolocationBloc.setSelectedRouteName(_selectedRouteName);
+                      geolocationBloc.add(GeoEvent.showSaved);                  
                     }),
-                  child: Padding(
-                    padding: index == 0 
-                      ? EdgeInsets.only(top: 12.0, bottom: 7)
-                      : EdgeInsets.symmetric(vertical: 7.0),
-                    child: Text(
-                          state.savedPaths[index] ?? 'no tracks available',
-                          style: Theme.of(context).textTheme.headline2,
-                          textAlign: TextAlign.center,
-                        ),
-                  ),
-              );
-            }
-          )
+                    child: Padding(
+                      padding: index == 0 
+                        ? EdgeInsets.only(top: 12.0, bottom: 7)
+                        : EdgeInsets.symmetric(vertical: 7.0),
+                      child: Text(
+                            state.savedPaths[index] ?? 'no tracks available',
+                            style: Theme.of(context).textTheme.headline2,
+                            textAlign: TextAlign.center,
+                          ),
+                    ),
+                );
+              }
+            )
+        )
+        : Container(      //show list of all tracks
+            width: 215,
+            height: 40,
+            padding: EdgeInsets.only(left: 24.0, right: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Theme.of(context).buttonColor,
+            ),   
+            child: Center(
+              child: Text(
+                'no tracks saved',
+                style: Theme.of(context).textTheme.headline2,
+              ),
+            ),
         );
   }
 
@@ -98,6 +114,8 @@ class _ReviewPageState extends State<ReviewPage> {
         //preset text edit with last value
         if (_selectedRouteName == null && state.status == Status.showSaved && state.savedPaths.length > 0) 
             _selectedRouteName = state.savedPaths[state.savedPaths.length-1];
+        //set _oldRoute in Bloc
+        geolocationBloc.setSelectedRouteName(_selectedRouteName);
         print('open track list? $_openTrackList ');
 
         return Container(
@@ -128,11 +146,11 @@ class _ReviewPageState extends State<ReviewPage> {
 
 //DropDown
               _openTrackList
-              ? Positioned(  //drop down for files
-                  left: 45,
-                  bottom: 75,                   
-                    child: FilesDropDown(context, state, geolocationBloc),
-                ) : Container(),
+                ? Positioned(  //drop down for files
+                    left: 45,
+                    bottom: 75,                   
+                      child: FilesDropDown(context, state, geolocationBloc),
+                  ) : Container(),
 
 //selected track box
               Positioned(
@@ -181,7 +199,7 @@ class _ReviewPageState extends State<ReviewPage> {
                 left: 33,
                 bottom: 43,              
                     child: IconButton(
-                      onPressed: () => setState(() { _openTrackList = !_openTrackList; }), //geolocationBloc.add(GeoEvent.deleteRoute), 
+                      onPressed: () => setState(() { _openTrackList = !_openTrackList; }),
                       icon: _openTrackList 
                         ? Icon(Icons.arrow_drop_down, size: 40.0)
                         : Icon(Icons.arrow_drop_up, size: 40.0),
@@ -209,6 +227,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     child: IconButton(
                       onPressed: () {                         
                         geolocationBloc.add(GeoEvent.deleteRoute);
+                        _selectedRouteName = null; //reset selected route name
                       },
                       icon: Icon(Icons.delete_outline, size: 18.0),
                       color: Theme.of(context).accentColor,

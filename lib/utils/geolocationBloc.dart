@@ -133,7 +133,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
 
   _showSavedRoute(String name) async {
     try {
-      _savedPaths = await _fileIo.listDir() ?? [];
+      _savedPaths = await _fileIo.listDir() ?? []; //load all file paths
       Map<String, dynamic> fileData = await _fileIo.readRoute(name);
       print('saved data in bloc? $fileData ');
       if (fileData != null && fileData['route'] != null) {
@@ -148,9 +148,26 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
     } catch(err) {  print('catching error showing saved route: $err');  }
   }
 
-  _deleteRoute(fileName) async {
-    await _fileIo.deleteFile(fileName);
-    //TODO update list of saved tracks, make sure that last track loads after delete
+  _deleteRoute(fileName) async { //delete selected route and update list of saved routes, show latest
+    try {
+      await _fileIo.deleteFile(fileName); //delete file
+      _savedPaths.removeWhere((path) => path == fileName); //remove file from list of paths
+      print('find latest track in bloc $_savedPaths');
+      String name = _savedPaths != null && _savedPaths.length > 0  //set name to newest saved route
+          ? _savedPaths[_savedPaths.length -1] : null;      
+      print('find latest track in bloc $name');
+      Map<String, dynamic> fileData = await _fileIo.readRoute(name); //show newest route
+      print('saved data in bloc? $fileData ');
+      if (fileData != null && fileData['route'] != null) {
+        _oldRoute = [];
+        fileData['route'].forEach((dynamic item) {
+          _oldRoute.add(LatLng.fromJson(item));
+         });
+      } else {
+        _oldRoute = [];
+        throw('no route saved');
+      }
+    } catch(err) {  print('catching error showing saved route: $err');  }
   }
 
 
@@ -209,9 +226,12 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         break;
 
       case GeoEvent.deleteRoute:
+        print('delete route in bloc: $_routeName');
         if (_routeName == null) return;
         String name =_routeName;
         await _deleteRoute(name);
+        print('oldRoute in bloc after delete $_oldRoute');
+        yield state.copyWith(status: Status.showSaved, oldRoute: _oldRoute, savedPaths: _savedPaths);
         break;
 
       case GeoEvent.error:
