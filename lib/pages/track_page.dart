@@ -6,6 +6,8 @@ import '../utils/geolocationBloc.dart';
 import '../widgets/map_track.dart';
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import '../utils/dialogs.dart';
+
 
 class TrackPage extends StatefulWidget {
   
@@ -56,6 +58,20 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
     animC.dispose();
     super.dispose();
   }
+
+  deleteDialog(context, geolocationBloc ) {
+    Dialogs.alert(context, 
+      title: "Delete Track", 
+      subtitle: "Are you sure?", 
+      confirm: "CONFIRM",
+      onConfirm: () {
+          geolocationBloc.add(GeoEvent.deleteRoute);
+          _selectedRouteName = null; //reset selected route name
+      }
+    );                         
+  }
+
+
 
  @override
   Widget build(BuildContext context) {

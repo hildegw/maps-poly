@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
                 headline1: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.white),
                 headline2: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: Colors.deepPurple),
                 subtitle1: TextStyle(fontSize: 14.0, color: Colors.deepPurple),
+                subtitle2: TextStyle(fontSize: 14.0, color: Colors.grey[800]),
               ),
             ),
             home: LocationPage(),//SplashPage(Permission.locationWhenInUse),

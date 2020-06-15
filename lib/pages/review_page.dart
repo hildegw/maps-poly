@@ -5,7 +5,7 @@ import '../widgets/map_review.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:math' as math;
-import 'package:intl/intl.dart';
+import '../utils/dialogs.dart';
 
 
 extension Precision on double {
@@ -31,6 +31,7 @@ class _ReviewPageState extends State<ReviewPage> {
   bool _openEdit = false;
   String _fileName;
 
+
   @override
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
@@ -46,6 +47,18 @@ class _ReviewPageState extends State<ReviewPage> {
         latitude: _oldRoute[_oldRoute.length-1].latitude.toPrecision(6), 
         longitude: _oldRoute[_oldRoute.length-1].longitude.toPrecision(6)
       ).toString() : state.position.toString();
+  }
+
+  deleteDialog(context, geolocationBloc ) {
+    Dialogs.alert(context, 
+      title: "Delete Track", 
+      subtitle: "Are you sure?", 
+      confirm: "CONFIRM",
+      onConfirm: () {
+          geolocationBloc.add(GeoEvent.deleteRoute);
+          _selectedRouteName = null; //reset selected route name
+      }
+    );                         
   }
 
 
@@ -225,10 +238,7 @@ class _ReviewPageState extends State<ReviewPage> {
                 left: 58,
                 bottom: 2,              
                     child: IconButton(
-                      onPressed: () {                         
-                        geolocationBloc.add(GeoEvent.deleteRoute);
-                        _selectedRouteName = null; //reset selected route name
-                      },
+                      onPressed: () { deleteDialog(context, geolocationBloc); },
                       icon: Icon(Icons.delete_outline, size: 18.0),
                       color: Theme.of(context).accentColor,
                       padding: EdgeInsets.only(bottom: 0),
