@@ -53,39 +53,41 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
     }
  }
 
+  overwriteDialog(context, geolocationBloc) {
+    Dialogs.alert(context, 
+      title: "Overwrite Track", 
+      subtitle: "The filename already exists. Do you want to overwrite?", 
+      confirm: "CONFIRM",
+      onConfirm: () { geolocationBloc.add(GeoEvent.saveRoute); }
+    );                         
+  }
+
+
   @override
   void dispose() {
     animC.dispose();
     super.dispose();
   }
 
-  deleteDialog(context, geolocationBloc ) {
-    Dialogs.alert(context, 
-      title: "Delete Track", 
-      subtitle: "Are you sure?", 
-      confirm: "CONFIRM",
-      onConfirm: () {
-          geolocationBloc.add(GeoEvent.deleteRoute);
-          _selectedRouteName = null; //reset selected route name
-      }
-    );                         
-  }
-
-
 
  @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
+   // if (geolocationBloc.state.status == Status.overwrite) 
+     Future.delayed(Duration.zero, () => overwriteDialog(context, geolocationBloc)); // import 'dart:async';
+
     return BlocBuilder<GeolocationBloc, GeoState> (
-        builder: (context, state) {
-        return Container(
+      builder: (context, state) {
+      print('track page bloc builder state status ${state.status} ');
+
+      return Container(
         width: double.maxFinite,
         height: double.maxFinite,
         child: Stack(
           children: <Widget>[
             
             MapTrack(),
-            
+          
             Positioned( //Lat Lon info top 
               left: 10,
               top:  10,
@@ -166,6 +168,7 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                           //print('on tap track page ${_formKey.currentState.validate()}');
                           _fileName = _formKey.currentState.validate() ? _fileName : now;                          
                           geolocationBloc.setSelectedRouteName(_fileName);  
+                          //geolocationBloc.add(GeoEvent.checkOverwrite);
                           geolocationBloc.add(GeoEvent.saveRoute);
                         }, 
                         child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),

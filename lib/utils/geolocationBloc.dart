@@ -8,8 +8,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 
-enum GeoEvent { start, move, nextMove, stop, reset, error, saveRoute, showSaved, deleteRoute }
-enum Status { loading, showing, moving, stopped, saved, showSaved, reset, error }
+enum GeoEvent { start, move, nextMove, stop, reset, error, checkOverwrite, saveRoute, showSaved, deleteRoute }
+enum Status { loading, showing, moving, stopped, overwrite, saved, showSaved, reset, error }
 
 
 class GeoState {
@@ -29,7 +29,7 @@ class GeoState {
     this.oldRoute, 
     //this.routeName,
     this.savedPaths,
-    this.error 
+    this.error, 
     });
 
   GeoState copyWith({
@@ -119,7 +119,6 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
     }
 
   Future <bool> _saveRoute(String name) async { //save to app file storage
-  //TODO check if name exists and overwrite
     try {
       print('saving route with name $_routeName in bloc ${_myRoute.toString()} ');
       await _fileIo.writeRoute(_myRoute, _routeName);
@@ -131,9 +130,25 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       }
   }
 
+  Future <bool> _checkOverwrite(String name) async { //save to app file storage
+   // try {
+      _savedPaths = await _fileIo.listDir(); //load all file paths to check if name exists
+    Map<String, dynamic> fileData = await _fileIo.readRoute(name);
+      bool overwrite = _savedPaths.contains(name);
+      print('check if track with name $name exists, in bloc $overwrite ');
+      print('check if track is in list $_savedPaths ');
+      return overwrite;
+    // } catch(err) {  
+    //     print('catching error checking if track name exists $err');  
+    //     _errorText = err;
+    //     return false;
+    // }
+  }
+
   _showSavedRoute(String name) async {
     try {
       _savedPaths = await _fileIo.listDir() ?? []; //load all file paths
+      print('show saved route in bloc $_savedPaths');
       Map<String, dynamic> fileData = await _fileIo.readRoute(name);
       print('saved data in bloc? $fileData ');
       if (fileData != null && fileData['route'] != null) {
@@ -206,14 +221,26 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         yield state.copyWith(status: Status.stopped);
         break;
 
+      case GeoEvent.checkOverwrite:
+        print('check if track name exists, name $_routeName');
+        String name =_routeName;
+        bool askToOverwrite = await _checkOverwrite(name);
+        print('any files in bloc for checking? $_savedPaths ');
+        print('check overwrite $askToOverwrite');
+        yield state.copyWith(status: askToOverwrite ? Status.overwrite : Status.showSaved, savedPaths: _savedPaths);
+        break;
+
       case GeoEvent.saveRoute:
         print('save route event, name $_routeName');
-        //if (_routeName == null) return;
         String name =_routeName;
-        bool isSaved = await _saveRoute(name);
-        yield isSaved 
-          ? state.copyWith(status: Status.saved)
-          : state.copyWith(status: Status.error, error: _errorText);
+        bool askToOverwrite = await _checkOverwrite(name);
+        if (askToOverwrite) yield state.copyWith(status: askToOverwrite ? Status.overwrite : Status.showSaved, savedPaths: _savedPaths);
+        else {
+          bool isSaved = await _saveRoute(name);
+          yield isSaved 
+            ? state.copyWith(status: Status.saved)
+            : state.copyWith(status: Status.error, error: _errorText);
+        }
         break;
 
       case GeoEvent.showSaved:

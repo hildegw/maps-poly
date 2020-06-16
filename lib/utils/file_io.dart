@@ -24,15 +24,18 @@ class FileIo {
   Future<List<String>> listDir() async {
     List<String> dirList = [];
     final path = await _localPath;
+    print('await 1 in file io $path');
     final directory = await getApplicationDocumentsDirectory();
-    directory.list(recursive: true).listen((FileSystemEntity ent) {
+    print('await 2 in file io $directory');
+    await directory.list(recursive: true).listen((FileSystemEntity ent) {
       if (ent.path.contains('/routes/')) {
         print('found a file ${ent.path}');
         String removePath = ent.path.replaceAll(path, '');
         dirList.add(removePath.replaceAll('.txt', ''));
       }
     });
-    print(dirList.toString());
+    print('await 3 in file io');
+    print('result from listDir in file io ${dirList.toString()}');
     return dirList;
   }
 
@@ -40,7 +43,7 @@ class FileIo {
     final String now = new DateFormat('yyyy-MM-dd hh:mm').toString();
     final file = await _localFile(fileName);
     var sink = file.openWrite();
-        String json = jsonEncode({
+    String json = jsonEncode({
       'fileName': fileName,
       'timeStamp': now,
       'route': route,
