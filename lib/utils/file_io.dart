@@ -13,6 +13,7 @@ class FileIo {
     final directory = await getApplicationDocumentsDirectory();
     if (await Directory(directory.path + "/routes").exists() != true)
         Directory(directory.path + "/routes").createSync(recursive: true);
+    print('fileio get local path ${directory.path} ');
     return directory.path + "/routes/";
   }
 
@@ -27,17 +28,24 @@ class FileIo {
     print('await 1 in file io $path');
     final directory = await getApplicationDocumentsDirectory();
     print('await 2 in file io $directory');
-    await directory.list(recursive: true).listen((FileSystemEntity ent) {
+    await for (var ent in directory.list(recursive: true)) {
       if (ent.path.contains('/routes/')) {
-        print('found a file ${ent.path}');
-        String removePath = ent.path.replaceAll(path, '');
-        dirList.add(removePath.replaceAll('.txt', ''));
-      }
-    });
-    print('await 3 in file io');
-    print('result from listDir in file io ${dirList.toString()}');
+          print('found a file ${ent.path}');
+          String removePath = ent.path.replaceAll(path, '');
+          dirList.add(removePath.replaceAll('.txt', ''));
+        }
+    }
     return dirList;
   }
+
+  fileExists(String name) async {
+    final path = await _localPath + name + '.txt';
+    print(path);
+    print('in fileio file exists? $name, ${File(path).existsSync()} ');
+    return File(path).exists();
+    //FileSystemEntity.typeSync(path + name) != FileSystemEntityType.notFound;
+  }
+
 
   writeRoute(List<LatLng> route, String fileName) async {
     final String now = new DateFormat('yyyy-MM-dd hh:mm').toString();

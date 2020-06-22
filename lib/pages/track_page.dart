@@ -73,12 +73,12 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
  @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-   // if (geolocationBloc.state.status == Status.overwrite) 
-     Future.delayed(Duration.zero, () => overwriteDialog(context, geolocationBloc)); // import 'dart:async';
-
+   
     return BlocBuilder<GeolocationBloc, GeoState> (
       builder: (context, state) {
       print('track page bloc builder state status ${state.status} ');
+      if (state.status == Status.overwrite) 
+        Future.delayed(Duration.zero, () => overwriteDialog(context, geolocationBloc)); // import 'dart:async';
 
       return Container(
         width: double.maxFinite,
@@ -168,8 +168,8 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
                           //print('on tap track page ${_formKey.currentState.validate()}');
                           _fileName = _formKey.currentState.validate() ? _fileName : now;                          
                           geolocationBloc.setSelectedRouteName(_fileName);  
-                          //geolocationBloc.add(GeoEvent.checkOverwrite);
-                          geolocationBloc.add(GeoEvent.saveRoute);
+                          geolocationBloc.add(GeoEvent.checkOverwrite);
+                          //geolocationBloc.add(GeoEvent.saveRoute);
                         }, 
                         child: Icon(Icons.save_alt, size: 30, color: Theme.of(context).accentColor,),
                         splashColor: Theme.of(context).cardColor,

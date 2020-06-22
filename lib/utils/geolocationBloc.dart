@@ -131,18 +131,17 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
   }
 
   Future <bool> _checkOverwrite(String name) async { //save to app file storage
-   // try {
-      _savedPaths = await _fileIo.listDir(); //load all file paths to check if name exists
-    Map<String, dynamic> fileData = await _fileIo.readRoute(name);
-      bool overwrite = _savedPaths.contains(name);
+   try {
+      //_savedPaths = await _fileIo.listDir(); //load all file paths to check if name exists
+      bool overwrite = await _fileIo.fileExists(name);
+      //if (_savedPaths != null && _savedPaths.length > 0) overwrite = _savedPaths.contains(name);
       print('check if track with name $name exists, in bloc $overwrite ');
-      print('check if track is in list $_savedPaths ');
       return overwrite;
-    // } catch(err) {  
-    //     print('catching error checking if track name exists $err');  
-    //     _errorText = err;
-    //     return false;
-    // }
+     } catch(err) {  
+         print('catching error checking if track name exists $err');  
+         _errorText = err;
+         return false;
+     }
   }
 
   _showSavedRoute(String name) async {
@@ -225,22 +224,18 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         print('check if track name exists, name $_routeName');
         String name =_routeName;
         bool askToOverwrite = await _checkOverwrite(name);
-        print('any files in bloc for checking? $_savedPaths ');
         print('check overwrite $askToOverwrite');
-        yield state.copyWith(status: askToOverwrite ? Status.overwrite : Status.showSaved, savedPaths: _savedPaths);
+        if (askToOverwrite) yield state.copyWith(status: Status.overwrite);
+        else  this.add(GeoEvent.saveRoute);
         break;
 
       case GeoEvent.saveRoute:
         print('save route event, name $_routeName');
         String name =_routeName;
-        bool askToOverwrite = await _checkOverwrite(name);
-        if (askToOverwrite) yield state.copyWith(status: askToOverwrite ? Status.overwrite : Status.showSaved, savedPaths: _savedPaths);
-        else {
-          bool isSaved = await _saveRoute(name);
-          yield isSaved 
-            ? state.copyWith(status: Status.saved)
-            : state.copyWith(status: Status.error, error: _errorText);
-        }
+        bool isSaved = await _saveRoute(name);
+        yield isSaved 
+          ? state.copyWith(status: Status.saved)
+          : state.copyWith(status: Status.error, error: _errorText);
         break;
 
       case GeoEvent.showSaved:
