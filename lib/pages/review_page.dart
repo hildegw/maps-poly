@@ -51,7 +51,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   deleteDialog(context, geolocationBloc ) {
     Dialogs.alert(context, 
-      title: "Delete Track", 
+      title: "Delete Track $_selectedRouteName", 
       subtitle: "Are you sure?", 
       confirm: "CONFIRM",
       onConfirm: () {
@@ -129,7 +129,8 @@ class _ReviewPageState extends State<ReviewPage> {
             _selectedRouteName = state.savedPaths[state.savedPaths.length-1];
         //set _oldRoute in Bloc
         geolocationBloc.setSelectedRouteName(_selectedRouteName);
-        print('open track list? $_openTrackList ');
+        print('review page selected route name? $_selectedRouteName ');
+        print('review page bloc builder state status ${state.status} ');
 
         return Container(
           width: double.maxFinite,
@@ -276,7 +277,13 @@ class _ReviewPageState extends State<ReviewPage> {
                               },
                               initialValue: _selectedRouteName,
                               onChanged: (value) => _fileName = value,
-                              onFieldSubmitted: (value) => _fileName = value,
+                              onFieldSubmitted: (value) {//TODO
+                                setState(() { _openEdit = !_openEdit; });                                
+                                _fileName = value;
+                                _selectedRouteName = value; 
+                                geolocationBloc.setNewRouteName(_selectedRouteName);   
+                                geolocationBloc.add(GeoEvent.renameRoute);
+                              },
                               cursorColor: Theme.of(context).accentColor,
                               maxLines: 1,
                               style: Theme.of(context).textTheme.headline2,
@@ -304,10 +311,10 @@ class _ReviewPageState extends State<ReviewPage> {
                               child: InkWell(     
                                 onTap: () {
                                   //TODO
-                                  setState(() { 
-                                    _openEdit = !_openEdit; 
-                                    //_openTrackList = false;
-                                  });
+                                  setState(() { _openEdit = !_openEdit; });
+                                  _selectedRouteName = _fileName; 
+                                  geolocationBloc.setNewRouteName(_selectedRouteName);
+                                  geolocationBloc.add(GeoEvent.renameRoute);
                                   //_fileName = _formKey.currentState.validate() ? _fileName : null;                          
                                 }, 
                                 child: Icon(Icons.check_circle_outline, size: 20, color: Theme.of(context).accentColor,),

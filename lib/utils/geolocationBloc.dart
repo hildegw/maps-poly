@@ -8,7 +8,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 
-enum GeoEvent { start, move, nextMove, stop, reset, error, checkOverwrite, saveRoute, showSaved, deleteRoute }
+enum GeoEvent { start, move, nextMove, stop, reset, error, checkOverwrite, 
+  saveRoute, showSaved, deleteRoute, renameRoute }
 enum Status { loading, showing, moving, stopped, overwrite, saved, showSaved, reset, error }
 
 
@@ -66,11 +67,13 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
   List<LatLng> _myRoute = List();
   List<LatLng> _oldRoute = List();
   String _routeName;
+  String _newRouteName;
   List<String> _savedPaths = [];
   FileIo _fileIo = FileIo();
 
   //called from track page
   setSelectedRouteName(String name) => _routeName = name;
+  setNewRouteName(String name) => _newRouteName = name;
 
   _getPosition() async { //get initial location
     try {
@@ -122,6 +125,19 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
     try {
       print('saving route with name $_routeName in bloc ${_myRoute.toString()} ');
       await _fileIo.writeRoute(_myRoute, _routeName);
+      return true;
+    } catch(err) {  
+        print('catching error saving route $err');  
+        _errorText = err;
+        return false;
+      }
+  }
+
+  Future<bool> _renameRoute(String newName, String name) async { //rename existing file
+    try {
+      print('renaming route $_routeName in bloc with name $_newRouteName ');
+      await _fileIo.renameRoute(newName, name);
+      this.setSelectedRouteName(newName);
       return true;
     } catch(err) {  
         print('catching error saving route $err');  
@@ -237,6 +253,16 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
           ? state.copyWith(status: Status.saved)
           : state.copyWith(status: Status.error, error: _errorText);
         break;
+
+      case GeoEvent.renameRoute:
+        print('rename route event, name $_routeName');
+        String name =_routeName;
+        String newName = _newRouteName;
+        bool isSaved = await _renameRoute(newName, name);
+        if (isSaved) this.add(GeoEvent.showSaved); //state.copyWith(status: Status.saved)
+        else state.copyWith(status: Status.error, error: _errorText);
+        break;
+
 
       case GeoEvent.showSaved:
         //if (_routeName == null) return;

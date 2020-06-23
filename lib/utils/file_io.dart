@@ -61,6 +61,15 @@ class FileIo {
     sink.close();
   }
 
+  renameRoute(String newName, String fileName) async {
+    final path = await _localPath + fileName + '.txt';
+    final newPath = await _localPath + newName + '.txt';    
+    var test = await File(path).rename(newPath);
+    print('rename in fileio $test');
+  }
+
+
+
   Future<Map<String, dynamic>> readRoute(String fileName) async {
     Map<String, dynamic> fileData = {};
     String json = '';
