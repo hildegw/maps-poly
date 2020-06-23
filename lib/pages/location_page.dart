@@ -15,8 +15,12 @@ class LocationPage extends StatefulWidget {
 
 class _LocationPageState extends State<LocationPage> with SingleTickerProviderStateMixin {
 
-  List<Widget> listScreens;
-  int tabIndex = 0;
+  List<Widget> listScreens = [
+      TrackPage(),
+      ReviewPage(),
+      TrackPage(),
+    ];
+  int tabIndex;
 
 
 
@@ -24,25 +28,40 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
     geolocationBloc.add(GeoEvent.start);
-    listScreens = [
-      TrackPage(),
-      ReviewPage(),
-      TrackPage(),
-    ];    
+    tabIndex = 0;
     super.initState();
   }
 
-  
+  onTap(int index) => setState(() => tabIndex = index );
+
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
     final iconColor = Theme.of(context).bottomAppBarColor;
 
+    print('tab index $tabIndex');
 
     return SafeArea(
         child: Scaffold(
           body: listScreens[tabIndex],
-          bottomNavigationBar: ConvexAppBar(
+          bottomNavigationBar: BottomBar(onTap: onTap),
+        )
+      );
+  }
+}
+
+class BottomBar extends StatelessWidget {
+  final Function onTap;
+  BottomBar({this.onTap});
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+
+    var scaff = Scaffold.of(context).toString();
+    print('show scaffold state $scaff');
+
+    return ConvexAppBar(
             items: [
               TabItem(
                 title: 'Track',
@@ -57,20 +76,17 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
                 title: 'Settings'
               ),
             ],
-
             height: 50.0,
             top: -10.0,
+            initialActiveIndex: _selectedIndex,
             activeColor: Theme.of(context).bottomAppBarColor,
             color: Theme.of(context).buttonColor,
             backgroundColor: Theme.of(context).primaryColor,
-            //currentIndex: tabIndex,
             onTap: (int index) {
-              setState(() {
-                tabIndex = index;
-              });
+              onTap(index);
+              _selectedIndex = index;
+              print('on tap index $index');
             },
-          )
-        )
-      );
+          );
   }
 }
