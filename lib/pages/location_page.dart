@@ -22,8 +22,6 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
     ];
   int tabIndex;
 
-
-
   @override
   void initState() {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
@@ -36,10 +34,6 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-    final iconColor = Theme.of(context).bottomAppBarColor;
-
-    print('tab index $tabIndex');
 
     return SafeArea(
         child: Scaffold(
@@ -53,13 +47,9 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
 class BottomBar extends StatelessWidget {
   final Function onTap;
   BottomBar({this.onTap});
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-
-    var scaff = Scaffold.of(context).toString();
-    print('show scaffold state $scaff');
 
     return ConvexAppBar(
             items: [
@@ -78,14 +68,12 @@ class BottomBar extends StatelessWidget {
             ],
             height: 50.0,
             top: -10.0,
-            initialActiveIndex: _selectedIndex,
+            //initialActiveIndex: 1,
             activeColor: Theme.of(context).bottomAppBarColor,
             color: Theme.of(context).buttonColor,
             backgroundColor: Theme.of(context).primaryColor,
             onTap: (int index) {
               onTap(index);
-              _selectedIndex = index;
-              print('on tap index $index');
             },
           );
   }
