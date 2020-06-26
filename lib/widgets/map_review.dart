@@ -6,19 +6,27 @@ import 'package:geolocator/geolocator.dart';
 import '../utils/geolocationBloc.dart';
 
 
+class MapReview extends StatefulWidget {  
+  moveMethod() => createState().move();  //make move method available to Review Page 
+  @override
+  _MapReviewState createState() => _MapReviewState();
+}
 
-class MapReview extends StatelessWidget {
+class _MapReviewState extends State<MapReview> {
 
   final Completer<GoogleMapController> _controller = Completer();
   Map<PolylineId, Polyline> _polylines = Map();
   List<LatLng> _oldRoute = List();
 
 
-  // _move(Position position) async {
-  //   final cameraUpdate = CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude));
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller.animateCamera(cameraUpdate);
-  // }
+  void move() async {
+    print('move on');
+    if (_oldRoute != null && _oldRoute.length > 0) {
+      final cameraUpdate = CameraUpdate.newLatLng(_oldRoute[_oldRoute.length-1]);
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(cameraUpdate);
+    }
+  }
  
 
   @override
@@ -26,6 +34,7 @@ class MapReview extends StatelessWidget {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
 
       _oldRoute = geolocationBloc.state.oldRoute;
+
 
       final myPolyline = Polyline(
           polylineId: PolylineId("me"),
@@ -37,12 +46,18 @@ class MapReview extends StatelessWidget {
 
       return BlocBuilder<GeolocationBloc, GeoState> (
           builder: (context, state) {
+          if (_oldRoute != null && _oldRoute.length > 0) {
+             //this.move();
+              print('center in map Review ${_oldRoute[_oldRoute.length-1]} ');
+          }
+
           return geolocationBloc.state.status != Status.showSaved
             ? Center(child: CircularProgressIndicator())  
             : GoogleMap(
                 mapType: MapType.hybrid,
                 myLocationButtonEnabled: true,
                 myLocationEnabled: true,
+                //only sets the very first map, all else has to be done via move
                 initialCameraPosition: _oldRoute != null && _oldRoute.length > 0
                   ? CameraPosition(target: _oldRoute[_oldRoute.length-1], zoom: 14)
                   : CameraPosition(target: LatLng(state.position.latitude, state.position.longitude), zoom: 14),
@@ -50,6 +65,7 @@ class MapReview extends StatelessWidget {
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
+                //onTap: (latlon) {this.move();},
               );
           });
         

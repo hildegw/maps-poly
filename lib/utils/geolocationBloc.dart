@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../widgets/map_review.dart';
 
 
 enum GeoEvent { start, move, nextMove, stop, reset, error, checkOverwrite, 
@@ -163,7 +164,9 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
   _showSavedRoute(String name) async {
     try {
       _savedPaths = await _fileIo.listDir() ?? []; //load all file paths
-      print('show saved route in bloc $_savedPaths');
+      //if name is null, i.e. no route has been selected, show last route from list.
+      if (name == null && _savedPaths.length > 0) name = _savedPaths[_savedPaths.length-1];
+      print('show saved route in bloc $_savedPaths with name $name');
       Map<String, dynamic> fileData = await _fileIo.readRoute(name);
       print('saved data in bloc? $fileData ');
       if (fileData != null && fileData['route'] != null) {
@@ -171,6 +174,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         fileData['route'].forEach((dynamic item) {
           _oldRoute.add(LatLng.fromJson(item));
          });
+        MapReview().moveMethod();
       } else {
         _oldRoute = [];
         throw('no route saved');
