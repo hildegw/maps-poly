@@ -24,7 +24,7 @@ class _MapReviewState extends State<MapReview> {
       print('move on to ${_oldRoute[_oldRoute.length-1]}');
       final cameraUpdate = CameraUpdate.newLatLng(_oldRoute[_oldRoute.length-1]);
       final GoogleMapController controller = await _controller.future;
-      this.setState(() {controller.animateCamera(cameraUpdate);});  //moveCamera to jump rather than animate
+      controller.animateCamera(cameraUpdate);  //moveCamera to jump rather than animate
     }
   }
  
@@ -59,7 +59,7 @@ class _MapReviewState extends State<MapReview> {
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
-                onTap: (latlon) {this.moveCam();},
+                //onTap: (latlon) {this.moveCam();},
               ) 
 
               : Center(child: CircularProgressIndicator());
