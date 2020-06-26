@@ -7,7 +7,7 @@ import '../utils/geolocationBloc.dart';
 
 
 class MapReview extends StatefulWidget {  
-  moveMethod() => createState().move();  //make move method available to Review Page 
+  //moveCamera() => createState().moveCam();  //make move method available to Review Page 
   @override
   _MapReviewState createState() => _MapReviewState();
 }
@@ -19,22 +19,20 @@ class _MapReviewState extends State<MapReview> {
   List<LatLng> _oldRoute = List();
 
 
-  void move() async {
-    print('move on');
+  void moveCam() async {
     if (_oldRoute != null && _oldRoute.length > 0) {
+      print('move on to ${_oldRoute[_oldRoute.length-1]}');
       final cameraUpdate = CameraUpdate.newLatLng(_oldRoute[_oldRoute.length-1]);
       final GoogleMapController controller = await _controller.future;
-      controller.animateCamera(cameraUpdate);
+      this.setState(() {controller.animateCamera(cameraUpdate);});  //moveCamera to jump rather than animate
     }
   }
  
 
   @override
   Widget build(BuildContext context) {
-    final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
-
+      final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
       _oldRoute = geolocationBloc.state.oldRoute;
-
 
       final myPolyline = Polyline(
           polylineId: PolylineId("me"),
@@ -46,14 +44,10 @@ class _MapReviewState extends State<MapReview> {
 
       return BlocBuilder<GeolocationBloc, GeoState> (
           builder: (context, state) {
-          if (_oldRoute != null && _oldRoute.length > 0) {
-             //this.move();
-              print('center in map Review ${_oldRoute[_oldRoute.length-1]} ');
-          }
+          if (_oldRoute != null && _oldRoute.length > 0) this.moveCam();
 
-          return geolocationBloc.state.status != Status.showSaved
-            ? Center(child: CircularProgressIndicator())  
-            : GoogleMap(
+          return geolocationBloc.state.status == Status.showSaved
+            ? GoogleMap(
                 mapType: MapType.hybrid,
                 myLocationButtonEnabled: true,
                 myLocationEnabled: true,
@@ -65,8 +59,10 @@ class _MapReviewState extends State<MapReview> {
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
-                //onTap: (latlon) {this.move();},
-              );
+                onTap: (latlon) {this.moveCam();},
+              ) 
+
+              : Center(child: CircularProgressIndicator());
           });
         
   }

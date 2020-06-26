@@ -82,10 +82,7 @@ class _ReviewPageState extends State<ReviewPage> {
                       _selectedRouteName = state.savedPaths[index]; 
                       _openTrackList = !_openTrackList;
                       geolocationBloc.setSelectedRouteName(_selectedRouteName);
-                      geolocationBloc.add(GeoEvent.showSaved);    
-//TODO call move function in MapReview widget
-
-
+                      geolocationBloc.add(GeoEvent.showSaved); 
                     }),
                     child: Padding(
                       padding: index == 0 

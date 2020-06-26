@@ -11,7 +11,8 @@ import '../widgets/map_review.dart';
 
 enum GeoEvent { start, move, nextMove, stop, reset, error, checkOverwrite, 
   saveRoute, showSaved, deleteRoute, renameRoute }
-enum Status { loading, showing, moving, stopped, overwrite, saved, showSaved, reset, error }
+enum Status { loading, showing, moving, stopped, overwrite, saved, 
+    showSaved, reset, error }
 
 
 class GeoState {
@@ -174,7 +175,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         fileData['route'].forEach((dynamic item) {
           _oldRoute.add(LatLng.fromJson(item));
          });
-        MapReview().moveMethod();
+        //print('oldRoute is set in bloc to show $_oldRoute');
       } else {
         _oldRoute = [];
         throw('no route saved');
@@ -275,6 +276,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         print('any files in bloc? $_savedPaths ');
         print('waiting done');
         yield state.copyWith(status: Status.showSaved, oldRoute: _oldRoute, savedPaths: _savedPaths);
+        //MapReview().moveCamera(); //move to _oldRoute does not update map :-(
         break;
 
       case GeoEvent.deleteRoute:
