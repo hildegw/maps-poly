@@ -6,30 +6,37 @@ import 'package:geolocator/geolocator.dart';
 import '../utils/geolocationBloc.dart';
 
 
-class MapTrack extends StatefulWidget {
+class MapMarkers extends StatefulWidget {
   @override
-  _MapTrackState createState() => _MapTrackState();
+  _MapMarkersState createState() => _MapMarkersState();
 }
 
-class _MapTrackState extends State<MapTrack> {
+class _MapMarkersState extends State<MapMarkers> {
 
   final Completer<GoogleMapController> _controller = Completer();
+  Set<Marker> _markers = Set();
+  int _counter = 0;
+  //TODO handover to bloc and parent:_selectedLatLng;
 
-
-  _move(Position position) async {
-    final cameraUpdate = CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude));
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(cameraUpdate);
+  _addMarker(LatLng latlng) {
+    print('add marker $latlng');
+    Marker marker = Marker(
+      markerId: MarkerId(_counter.toString()),
+      infoWindow: InfoWindow(
+          title: _counter.toString(),
+          snippet: "snippetInfoWin"),
+      position: latlng,
+    );
+    setState(() =>_markers.add(marker));
+    _counter++;
   }
+
 
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
 
-      if (geolocationBloc.state.status == Status.moving) {
-        _move(geolocationBloc.state.position);
-        print('moving? ${geolocationBloc.state.position} ');
-      }
+  print('markers ${_markers.toString()} ');
 
     return BlocBuilder<GeolocationBloc, GeoState> (
         builder: (context, state) {
@@ -44,7 +51,8 @@ class _MapTrackState extends State<MapTrack> {
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
               },
-            //onTap: (pos) => print(pos.toString()),
+              markers: _markers,
+              onTap: (latlng) => _addMarker(latlng),
           );
       });
   }

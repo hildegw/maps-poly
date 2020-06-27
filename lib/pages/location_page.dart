@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maps/pages/review_page.dart';
+import 'package:maps/pages/markers_page.dart';
 import '../utils/geolocationBloc.dart';
 import './track_page.dart';
-import 'dart:math' as math;
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 
@@ -18,7 +18,7 @@ class _LocationPageState extends State<LocationPage> with SingleTickerProviderSt
   List<Widget> listScreens = [
       TrackPage(),
       ReviewPage(),
-      TrackPage(),
+      MarkersPage(),
     ];
   int tabIndex;
 

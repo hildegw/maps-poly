@@ -71,7 +71,7 @@ class GeoState {
       polylines: polylines ?? this.polylines,
       route: route ?? this.route,
       oldRoute: oldRoute ?? this.oldRoute,
-      //routeName: routeName ?? this.routeName,
+      routeName: routeName ?? this.routeName,
       savedPaths: savedPaths ?? this.savedPaths,
       error: error ?? this.error,
     );

@@ -55,6 +55,12 @@ class _ReviewPageState extends State<ReviewPage> {
     });
   }
 
+  infoDialog(context, geolocationBloc) {
+    Dialogs.info(context, 
+      subtitle: geolocationBloc.state.error, 
+    );                         
+  }
+
   Widget FilesDropDown(context, state, geolocationBloc) {
     print(state.savedPaths.length);
     return state.savedPaths.length > 0
@@ -113,6 +119,9 @@ class _ReviewPageState extends State<ReviewPage> {
   @override
   Widget build(BuildContext context) {
     final geolocationBloc = BlocProvider.of<GeolocationBloc>(context);
+
+    if (geolocationBloc.state.status == Status.error) 
+      Future.delayed(Duration.zero, () => infoDialog(context, geolocationBloc)); 
 
     return BlocBuilder<GeolocationBloc, GeoState>(builder: (context, state) {
       //preset text edit with with last value if empty
