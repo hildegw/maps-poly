@@ -62,6 +62,11 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
     );                         
   }
 
+  infoDialog(context, geolocationBloc) {
+    Dialogs.info(context, 
+      subtitle: geolocationBloc.state.error, 
+    );                         
+  }
 
   @override
   void dispose() {
@@ -77,8 +82,13 @@ class _TrackPageState extends State<TrackPage> with SingleTickerProviderStateMix
     return BlocBuilder<GeolocationBloc, GeoState> (
       builder: (context, state) {
       print('track page bloc builder state status ${state.status} ');
+
       if (state.status == Status.overwrite) 
         Future.delayed(Duration.zero, () => overwriteDialog(context, geolocationBloc)); // import 'dart:async';
+
+      if (state.status == Status.error) 
+        Future.delayed(Duration.zero, () => infoDialog(context, geolocationBloc)); 
+
 
       return Container(
         width: double.maxFinite,

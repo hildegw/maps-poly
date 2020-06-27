@@ -153,8 +153,9 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       await _fileIo.writeRoute(_myRoute, _routeName);
       return true;
     } catch (err) {
-      print('catching error saving route $err');
-      _errorText = err;
+      print('catching error saving route ${err.toString()}');
+      _errorText = 'error saving route: ' + err.toString();
+      this.add(GeoEvent.error);
       return false;
     }
   }
@@ -170,7 +171,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       return true;
     } catch (err) {
       print('catching error saving route ${err.toString()}');
-      _errorText = err.toString();
+      _errorText = 'error renaming route: ' + err.toString();
+      this.add(GeoEvent.error);      
       return false;
     }
   }
@@ -185,7 +187,8 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
       return overwrite;
     } catch (err) {
       print('catching error checking if track name exists ${err.toString()}');
-      _errorText = err.toString();
+      _errorText = 'error checking overwrite: ' + err.toString();
+      this.add(GeoEvent.error);
       return false;
     }
   }
@@ -210,7 +213,9 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         throw ('no route saved');
       }
     } catch (err) {
-      print('catching error showing saved route: $err');
+      print('catching error showing saved route: ${err.toString()}');
+      _errorText = 'error showing saved route: ' + err.toString();
+      this.add(GeoEvent.error);
     }
   }
 
@@ -236,11 +241,12 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         });
       } else {
         _oldRoute = [];
-        throw ('no route saved');
+        throw ('route not found');
       }
     } catch (err) {
-      print('catching error showing saved route: $err');
-    }
+      print('catching error dleleting route: ${err.toString()}');
+      _errorText = 'error showing deleted route: ' + err.toString();
+      this.add(GeoEvent.error);    }
   }
 
   @override
@@ -324,7 +330,7 @@ class GeolocationBloc extends Bloc<GeoEvent, GeoState> {
         yield state.copyWith(
             status: Status.showSaved,
             oldRoute: _oldRoute,
-            //routeName: _routeName,
+            //routeName: _routeName, //did not work
             savedPaths: _savedPaths);
         //MapReview().moveCamera(); //move to _oldRoute does not update map :-(
         break;
